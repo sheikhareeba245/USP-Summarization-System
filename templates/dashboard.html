@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — USP Summarization System{% endblock %}
+
+{% block content %}
+
+<nav class="navbar">
+    <div class="nav-brand">
+        <strong>USP Summarization System</strong>
+    </div>
+    <div class="nav-links">
+        <span class="nav-user">{{ name }}</span>
+        <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="dashboard-wrapper">
+
+    <div class="welcome-card">
+        <h2>Welcome, {{ name }}!</h2>
+        <div class="student-info">
+            <span><strong>Username:</strong> {{ username }}</span>
+            <span><strong>Department:</strong> {{ department }}</span>
+            <span><strong>Semester:</strong> {{ semester }}</span>
+        </div>
+    </div>
+
+    <div class="action-cards">
+
+        <div class="card">
+            <div class="card-icon">📄</div>
+            <h3>Upload Document</h3>
+            <p>Upload PDF, DOCX, or TXT file to generate summary</p>
+            <a href="#" class="btn-card">Upload Now</a>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">📚</div>
+            <h3>My Library</h3>
+            <p>View all your previously generated summaries</p>
+            <a href="#" class="btn-card">View Library</a>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">💬</div>
+            <h3>Chat with Document</h3>
+            <p>Ask questions about your uploaded documents</p>
+            <a href="#" class="btn-card">Start Chat</a>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
