@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Summary Options — USP Summarization{% endblock %}
+
+{% block content %}
+
+<nav class="navbar">
+    <div class="nav-brand"><strong>USP Summarization System</strong></div>
+    <div class="nav-links">
+        <span class="nav-user">{{ session.user_name }}</span>
+        <a href="/dashboard" class="btn-nav">Dashboard</a>
+        <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+
+    <div class="page-header">
+        <h2>Summary Options</h2>
+        <p>Choose how you want to summarize your document</p>
+    </div>
+
+    <div class="doc-info-card">
+        <span>📄 <strong>{{ doc_name }}</strong></span>
+        <span>Words: <strong>{{ word_count }}</strong></span>
+        <span>Size: <strong>{{ file_size }}</strong></span>
+    </div>
+
+    <form method="POST" action="/generate-summary">
+
+        <div class="options-grid">
+
+            <div class="option-card">
+                <h3>Summarization Mode</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="mode" value="academic" checked>
+                        <span>
+                            <strong>Academic Mode</strong>
+                            <small>Structured output Abstract, Methodology, Findings, Conclusion</small>
+                        </span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="mode" value="general">
+                        <span>
+                            <strong>General Mode</strong>
+                            <small>Standard summary for articles and reports</small>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="option-card">
+                <h3>Output Format</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="format" value="paragraph" checked>
+                        <span>
+                            <strong>Paragraph</strong>
+                            <small>Flowing narrative summary</small>
+                        </span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="format" value="bullets">
+                        <span>
+                            <strong>Bullet Points</strong>
+                            <small>Quick reference key points</small>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="option-card">
+                <h3>Summary Length</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="length" value="short">
+                        <span>
+                            <strong>Short</strong>
+                            <small>10-15% of original</small>
+                        </span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="length" value="medium" checked>
+                        <span>
+                            <strong>Medium</strong>
+                            <small>20-30% of original</small>
+                        </span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="length" value="detailed">
+                        <span>
+                            <strong>Detailed</strong>
+                            <small>35-50% of original</small>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <button type="submit" class="btn-generate">
+            Generate Summary
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

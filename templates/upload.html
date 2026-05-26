@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Upload Document — USP Summarization{% endblock %}
+
+{% block content %}
+
+<nav class="navbar">
+    <div class="nav-brand"><strong>USP Summarization System</strong></div>
+    <div class="nav-links">
+        <span class="nav-user">{{ session.user_name }}</span>
+        <a href="/dashboard" class="btn-nav">Dashboard</a>
+        <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+
+    <div class="page-header">
+        <h2>Upload Document</h2>
+        <p>Upload your PDF, DOCX, or TXT file to generate a summary</p>
+    </div>
+
+    <div class="upload-card">
+
+        <form method="POST" action="/upload" enctype="multipart/form-data" id="uploadForm">
+
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-icon">📄</div>
+                <p class="drop-text">Drag and drop your file here</p>
+                <p class="drop-sub">or</p>
+                <label for="document" class="btn-browse">Browse File</label>
+                <input
+                    type="file"
+                    id="document"
+                    name="document"
+                    accept=".pdf,.docx,.txt"
+                    style="display:none"
+                    required
+                >
+                <p class="file-info" id="fileInfo">No file selected</p>
+            </div>
+
+            <div class="format-info">
+                <span class="badge">PDF</span>
+                <span class="badge">DOCX</span>
+                <span class="badge">TXT</span>
+                <span class="badge-note">Max 50MB</span>
+            </div>
+
+            <button type="submit" class="btn-upload" id="uploadBtn">
+                Upload Document
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+const input = document.getElementById('document');
+const fileInfo = document.getElementById('fileInfo');
+const dropZone = document.getElementById('dropZone');
+const uploadBtn = document.getElementById('uploadBtn');
+
+input.addEventListener('change', function() {
+    if (this.files[0]) {
+        fileInfo.textContent = this.files[0].name;
+        fileInfo.style.color = '#1a3a6b';
+    }
+});
+
+dropZone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.style.borderColor = '#2e75b6';
+    this.style.background = '#f0f7ff';
+});
+
+dropZone.addEventListener('dragleave', function() {
+    this.style.borderColor = '#ddd';
+    this.style.background = 'white';
+});
+
+dropZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.style.borderColor = '#ddd';
+    this.style.background = 'white';
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+        input.files = e.dataTransfer.files;
+        fileInfo.textContent = file.name;
+        fileInfo.style.color = '#1a3a6b';
+    }
+});
+
+document.getElementById('uploadForm').addEventListener('submit', function() {
+    uploadBtn.textContent = 'Uploading...';
+    uploadBtn.disabled = true;
+});
+</script>
+
+{% endblock %}
