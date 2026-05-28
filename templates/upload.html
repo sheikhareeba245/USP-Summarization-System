@@ -28,13 +28,13 @@
                 <p class="drop-text">Drag and drop your file here</p>
                 <p class="drop-sub">or</p>
                 <label for="document" class="btn-browse">Browse File</label>
+                <!-- required attribute removed to prevent silent browser blocking -->
                 <input
                     type="file"
                     id="document"
                     name="document"
                     accept=".pdf,.docx,.txt"
                     style="display:none"
-                    required
                 >
                 <p class="file-info" id="fileInfo">No file selected</p>
             </div>
@@ -93,9 +93,19 @@ dropZone.addEventListener('drop', function(e) {
     }
 });
 
-document.getElementById('uploadForm').addEventListener('submit', function() {
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    // 1. JS-based validation check since input is hidden
+    if (!input.files || input.files.length === 0) {
+        e.preventDefault(); // Stop submission
+        alert('Please select or drag a file first.');
+        return;
+    }
+    
+    // 2. Update button text and safely disable on the next tick
     uploadBtn.textContent = 'Uploading...';
-    uploadBtn.disabled = true;
+    setTimeout(() => {
+        uploadBtn.disabled = true;
+    }, 0);
 });
 </script>
 

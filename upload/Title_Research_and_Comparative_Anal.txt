@@ -1,0 +1,147 @@
+Title: Research and Comparative Analysis of AI Summarization Systems 
+with a Proposed Web-Based Solution 
+System 1: ChatGPT 
+1.1. 
+Introduction 
+ChatGPT, developed by OpenAI, is a state-of-the-art conversational artificial intelligence 
+(AI) system based on the Generative Pre-trained Transformer (GPT) architecture. Since its 
+public release in late 2022, ChatGPT has revolutionized natural language processing (NLP) 
+by enabling human-like dialogue, content generation, summarization, translation, and more 
+across diverse domains such as healthcare, education, business, and research 
+Its core strength lies in its ability to understand context and generate coherent responses using 
+massive datasets and advanced deep learning techniques 
+However, alongside its transformative potential, ChatGPT presents notable challenges 
+including factual inaccuracies (“hallucinations”), biases inherited from training data, ethical 
+concerns regarding misuse and privacy, and technical limitations such as context window size 
+and explainability 
+This review provides a detailed exploration of ChatGPT’s technical modules and architecture, 
+their working mechanisms, deficiencies identified in the literature, functional and non
+functional requirements for both ChatGPT and a proposed system and a comparative 
+analysis. 
+1.2. 
+1. 
+Literature 
+1.2.1.  Modules and Their Working 
+Text Input and Cleaning Module 
+This module is responsible for receiving the user’s raw input and preparing it for 
+processing. It removes unnecessary formatting, extra spaces, line breaks, and other 
+unwanted elements so that the text becomes clean and structured. After cleaning, the text 
+is converted into a usable internal form that the system can analyze efficiently. This 
+module ensures that the input is properly organized before it moves to the next stage of 
+processing. 
+2. 
+Prompt Understanding Module 
+This module interprets the user’s instruction and determines what type of response is 
+required. It identifies the requested tone, length, and format, such as simple language, 
+formal writing, bullet points, or a detailed academic style. It also considers the context of 
+earlier messages to improve relevance and accuracy. This module helps the system 
+understand the exact purpose of the request before generating the response. 
+3. 
+4. 
+5. 
+Main Language Generation Module 
+This is the core module of the system, responsible for analyzing the input text and 
+producing a meaningful response. It studies the relationship between words, phrases, and 
+ideas, then generates new sentences that preserve the original meaning while presenting 
+the content in a clear and coherent way. The module does not simply copy the source 
+text; instead, it rewrites and summarizes the information according to the user’s request. 
+This module performs the main intelligence and writing task of the system. 
+Safety and Quality Checking Module 
+This module reviews the generated output before it is displayed to the user. It checks for 
+factual mistakes, harmful content, bias, and unclear wording, and improves the response 
+if needed. It also helps ensure that the answer remains appropriate, accurate, and aligned 
+with the user’s instruction. This module plays an important role in maintaining the 
+reliability and safety of the system. 
+Output Formatting Module 
+This module arranges the final response in the required structure. It presents the content 
+as paragraphs, bullet points, or another requested format, depending on the user’s 
+preference. It also improves readability by making sure the answer is well organized and 
+professionally written. This module gives the final output its polished and user-friendly 
+appearance. 
+6. 
+Delivery and Memory Module 
+This module presents the final response to the user and maintains conversational 
+continuity. It preserves relevant context from the interaction so that later responses can 
+remain connected to the same discussion. This helps the system provide more consistent 
+and meaningful replies in follow-up questions. The module is responsible for delivering 
+the final answer and supporting ongoing interaction. 
+1.2.3. Deficiencies 
+• Hallucination and factual inaccuracy 
+ChatGPT can generate answers that sound very confident but are still wrong. This is a 
+serious weakness in summarization because a summary is supposed to preserve the 
+original meaning, not add new information. In academic content, it may invent 
+citations, names, numbers, or claims that were never in the source text. It can also 
+misquote authors or slightly change facts in a way that makes the summary unreliable. 
+This means the user may trust the output even when it contains hidden mistakes. For a 
+research project, this weakness is important because it shows that human checking is 
+still necessary. 
+• Context window limitations 
+ChatGPT can only process a limited amount of text at one time, so very large 
+documents may not be handled perfectly. When the content becomes too long, some 
+parts may be ignored or reduced too much. This can cause the summary to lose 
+connection between different sections of the document. For example, the introduction 
+may be summarized separately from the conclusion without keeping the full logic of 
+the paper. In long academic documents, this becomes a major problem because 
+meaning is often spread across many pages. So, even if the model can read a lot, it 
+may still miss important relationships in the text. 
+• No native file uploads 
+In basic use, ChatGPT does not act like a dedicated document summarizer with a 
+proper upload-and-read workflow. Users usually need to copy and paste the text 
+manually, which is not ideal for long PDFs, reports, or Word files. This creates extra 
+work and wastes time, especially when the document is large. Manual pasting can 
+also damage formatting, remove headings, and break table structure. As a result, the 
+model may receive text that is already messy before summarization even starts. This 
+makes it less suitable for a clean academic document-processing system. 
+• Lack of summary controls 
+ChatGPT depends heavily on the wording of the user’s prompt to control summary 
+length and style. If the prompt is not written carefully, the output may be too long, too 
+short, too general, or too detailed. There are no built-in buttons for exact options like 
+short, medium, or long summaries in a standard summarization interface. This makes 
+the process less stable because users have to keep adjusting the prompt again and 
+again. For students or non-technical users, this trial-and-error method is not very 
+convenient. It also makes the output harder to standardize in a research environment. 
+• Domain-specific weaknesses 
+ChatGPT performs better on general topics than on highly specialized content. In 
+legal, medical, scientific, or programming documents, it may miss technical meaning 
+or simplify too much. That is dangerous because a small change in a technical 
+statement can completely change the meaning. For example, a medical summary may 
+lose an important warning, or a code explanation may become inaccurate. In academic 
+research, this can reduce trust in the output and force the user to review everything 
+manually. So, its general intelligence does not always mean expert-level 
+summarization in every field. 
+• Privacy and data retention concerns 
+Another weakness is that users may worry about how their uploaded or pasted 
+information is handled. If the content is sensitive, confidential, or unpublished, the 
+user may not want it processed in a system where storage or model improvement 
+policies are unclear to them. This is especially important for student theses, research 
+drafts, business documents, or private notes. Even if the system has privacy controls, 
+many users do not fully understand them. That creates hesitation and lowers 
+confidence in the platform. For your project, privacy should be treated as a major 
+design requirement because it is one of the common fears users have with AI tools. 
+• No summary history or tracking 
+ChatGPT does not naturally give a dedicated summary history system for organized 
+document management. Once a conversation becomes old or crowded, it becomes 
+harder to find previous summaries quickly. There is also no built-in academic-style 
+tracking such as document name, summary date, summary rating, or version 
+comparison. This means users cannot easily compare how a document was 
+summarized at different times. For research work, that is a weak point because 
+students often need to revisit old summaries or check what changed. A proper 
+summarization system should store and organize this information clearly. 
+1.3. 
+Functional Requirements  
+1. Accept text prompts up to 128K tokens 
+2. Generate abstractive summaries in natural language 
+3. Support bullet/paragraph/custom formats via prompting 
+4. Maintain conversation context  
+5. Apply safety filters and content moderation 
+6. API integration for developers 
+7. Multi-language support  
+1.4. 
+Non-Functional Requirements  
+• Performance: 3 to15s response time  
+• Scalability: Millions concurrent users  
+• Availability: 99.95% uptime 
+• Usability: Conversational interface  
+• Reliability: 82 to 91% accuracy  
+• Security: TLS encryption, prompt injection mitigation 
+• Maintainability: Black-box API 

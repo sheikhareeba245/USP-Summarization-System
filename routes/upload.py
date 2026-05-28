@@ -26,7 +26,28 @@ def login_required(f):
 @upload.route('/upload', methods=['GET', 'POST'])
 @login_required
 def upload_document():
+
+    if request.method == 'GET':
+        session.pop('current_doc_id', None)
+        session.pop('current_doc_name', None)
+        session.pop('current_doc_text', None)
+        session.pop('word_count', None)
+        session.pop('file_size', None)
+        session.pop('current_summary_id', None)
+        session.pop('current_summary', None)
+        session.pop('current_keywords', None)
+        session.pop('current_mode', None)
+        session.pop('current_format', None)
+
     if request.method == 'POST':
+
+        session.pop('current_doc_id', None)
+        session.pop('current_doc_name', None)
+        session.pop('current_doc_text', None)
+        session.pop('current_doc_word_count', None)
+        session.pop('current_summary_id', None)
+        session.pop('current_summary', None)
+        session.pop('current_keywords', None)
         
         # File check
         if 'document' not in request.files:
@@ -75,10 +96,9 @@ def upload_document():
         db.session.add(document)
         db.session.commit()
         
-        # Session mein save karo
+        
         session['current_doc_id'] = document.document_id
         session['current_doc_name'] = filename
-        session['current_doc_text'] = extracted_text
         session['word_count'] = word_count
         session['file_size'] = file_size
         

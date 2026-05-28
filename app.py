@@ -21,13 +21,19 @@ def create_app():
     from routes.auth import auth
     app.register_blueprint(auth)
     
-    # Upload blueprint alag try karo
     try:
         from routes.upload import upload
         app.register_blueprint(upload)
         print("Upload blueprint registered!")
     except Exception as e:
         print(f"Upload blueprint ERROR: {e}")
+    
+    try:
+        from routes.summarize import summarize
+        app.register_blueprint(summarize)      
+        print("Summarize blueprint registered!")
+    except Exception as e:
+        print(f"Summarize blueprint ERROR: {e}")
     
     with app.app_context():
         from models.user import User

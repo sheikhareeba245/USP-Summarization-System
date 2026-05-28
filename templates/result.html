@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Summary Result — USP Summarization{% endblock %}
+
+{% block content %}
+
+<nav class="navbar">
+    <div class="nav-brand"><strong>USP Summarization System</strong></div>
+    <div class="nav-links">
+        <span class="nav-user">{{ session.user_name }}</span>
+        <a href="/dashboard" class="btn-nav">Dashboard</a>
+        <a href="/upload" class="btn-nav">New Document</a>
+        <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+
+    <div class="result-header">
+        <h2>Summary Generated</h2>
+        <div class="result-meta">
+            <span class="badge">{{ doc_name }}</span>
+            <span class="badge">{{ mode | capitalize }} Mode</span>
+            <span class="badge">{{ length | capitalize }}</span>
+            <span class="badge">{{ output_format | capitalize }}</span>
+        </div>
+    </div>
+
+    <div class="result-grid">
+
+        <!-- Summary Section -->
+        <div class="result-card">
+            <div class="card-header">
+                <h3>Generated Summary</h3>
+                <button class="btn-copy" onclick="copySummary()">
+                    Copy
+                </button>
+            </div>
+
+            <div class="summary-content" id="summaryContent">
+                {% if is_academic %}
+                    {% for section, content in summary.items() %}
+                        <div class="academic-section">
+                            <h4 class="section-title">{{ section }}</h4>
+                            <div class="section-content">
+                                {% if '\n•' in content %}
+                                    {% for line in content.split('\n') %}
+                                        {% if line.strip() %}
+                                            <p>{{ line }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <p>{{ content }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {% if '\n•' in summary %}
+                        {% for line in summary.split('\n') %}
+                            {% if line.strip() %}
+                                <p>{{ line }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p>{{ summary }}</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="card-actions">
+                <button class="btn-action" onclick="copySummary()">Copy Summary</button>
+                <a href="/download/{{ summary_id }}" class="btn-action">Download PDF</a>
+            </div>
+        </div>
+
+        <!-- Keywords Section -->
+        <div class="side-panel">
+
+            <div class="keywords-card">
+                <h3>Keywords</h3>
+                <div class="keywords-list">
+                    {% for keyword in keywords %}
+                        <span class="keyword-tag">{{ keyword }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rating-card">
+                <h3>Rate this Summary</h3>
+                <div class="stars" id="stars">
+                    {% for i in range(1, 6) %}
+                        <span class="star" data-value="{{ i }}" onclick="rateSummary({{ i }})">★</span>
+                    {% endfor %}
+                </div>
+                <p class="rating-msg" id="ratingMsg"></p>
+            </div>
+
+            <div class="actions-card">
+                <a href="/upload" class="btn-full">New Document</a>
+                <a href="/library" class="btn-full btn-outline">View Library</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+function copySummary() {
+    const content = document.getElementById('summaryContent').innerText;
+    navigator.clipboard.writeText(content).then(function() {
+        const btn = document.querySelector('.btn-copy');
+        btn.textContent = 'Copied!';
+        btn.style.background = '#1a3a6b';
+        btn.style.color = 'white';
+        setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.style.background = '';
+            btn.style.color = '';
+        }, 2000);
+    });
+}
+
+function rateSummary(value) {
+    const stars = document.querySelectorAll('.star');
+    stars.forEach((star, index) => {
+        star.style.color = index < value ? '#f0a500' : '#ddd';
+    });
+
+    fetch('/rate-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            summary_id: {{ summary_id }},
+            rating: value
+        })
+    }).then(r => r.json()).then(data => {
+        document.getElementById('ratingMsg').textContent = 'Thank you for your rating!';
+    });
+}
+</script>
+
+{% endblock %}

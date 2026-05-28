@@ -29,16 +29,43 @@ def extract_pdf(file_path):
     return text.strip()
 
 def extract_docx(file_path):
-    doc = DocxDocument(file_path)
-    text = ""
-    for para in doc.paragraphs:
-        if para.text.strip():
-            text += para.text + "\n"
-    return text.strip()
+    try:
+        doc = DocxDocument(file_path)
+        text_parts = []
+        
+        for para in doc.paragraphs:
+            if para.text.strip():
+                text_parts.append(para.text.strip())
+        
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    if cell.text.strip():
+                        text_parts.append(cell.text.strip())
+        
+        full_text = '\n'.join(text_parts)
+        
+        if len(full_text.strip()) < 50:
+            return None
+            
+        return full_text.strip()
+        
+    except Exception as e:
+        print(f"DOCX extraction error: {e}")
+        return None
+
 
 def extract_txt(file_path):
-    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-        return f.read().strip()
+    encodings = ['utf-8', 'latin-1', 'cp1252', 'ascii']
+    for encoding in encodings:
+        try:
+            with open(file_path, 'r', encoding=encoding) as f:
+                text = f.read().strip()
+                if text:
+                    return text
+        except:
+            continue
+    return None
 
 def get_word_count(text):
     return len(text.split())
