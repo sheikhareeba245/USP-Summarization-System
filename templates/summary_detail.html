@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Summary Detail — USP Summarization{% endblock %}
+
+{% block content %}
+
+<nav class="navbar">
+    <div class="nav-brand"><strong>USP Summarization System</strong></div>
+    <div class="nav-links">
+        <span class="nav-user">{{ session.user_name }}</span>
+        <a href="/library" class="btn-nav">My Library</a>
+        <a href="/upload" class="btn-nav">New Document</a>
+        <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+
+    <div class="result-header">
+        <h2>Summary Detail</h2>
+        <div class="result-meta">
+            <span class="badge">{{ doc_name }}</span>
+            <span class="badge">{{ mode | capitalize }} Mode</span>
+            <span class="badge">{{ length | capitalize }}</span>
+            <span class="badge">{{ generated_date.strftime('%d %b %Y') }}</span>
+        </div>
+    </div>
+
+    <div class="result-grid">
+
+        <div class="result-card">
+            <div class="card-header">
+                <h3>Summary</h3>
+                <button class="btn-copy" onclick="copySummary()">Copy</button>
+            </div>
+
+            <div class="summary-content" id="summaryContent">
+                {% if is_academic %}
+                    {% for section, content in summary.items() %}
+                        <div class="academic-section">
+                            <h4 class="section-title">{{ section }}</h4>
+                            <div class="section-content">
+                                {% for line in content.split('\n') %}
+                                    {% if line.strip() %}
+                                        <p>{{ line }}</p>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {% for line in summary.split('\n') %}
+                        {% if line.strip() %}
+                            <p>{{ line }}</p>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="card-actions">
+                <button class="btn-action" onclick="copySummary()">Copy</button>
+                <a href="/download/{{ summary_id }}" class="btn-action">Download PDF</a>
+                <a href="/library" class="btn-action btn-outline">Back to Library</a>
+            </div>
+        </div>
+
+        <div class="side-panel">
+
+            <div class="keywords-card">
+                <h3>Keywords</h3>
+                <div class="keywords-list">
+                    {% for kw in keywords %}
+                        <span class="keyword-tag">{{ kw }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rating-card">
+                <h3>Your Rating</h3>
+                <div class="stars" id="stars">
+                    {% for i in range(1, 6) %}
+                        <span class="star"
+                            data-value="{{ i }}"
+                            onclick="rateSummary({{ i }})"
+                            style="color: {% if rating and i <= rating %}#f0a500{% else %}#ddd{% endif %}">
+                            ★
+                        </span>
+                    {% endfor %}
+                </div>
+                <p class="rating-msg" id="ratingMsg">
+                    {% if rating %}Rated {{ rating }}/5{% endif %}
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+function copySummary() {
+    const content = document.getElementById('summaryContent').innerText;
+    navigator.clipboard.writeText(content).then(function() {
+        const btn = document.querySelector('.btn-copy');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+}
+
+function rateSummary(value) {
+    document.querySelectorAll('.star').forEach((star, i) => {
+        star.style.color = i < value ? '#f0a500' : '#ddd';
+    });
+    fetch('/library/rate/{{ summary_id }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({rating: value})
+    }).then(() => {
+        document.getElementById('ratingMsg').textContent = 'Rated ' + value + '/5';
+    });
+}
+</script>
+
+{% endblock %}

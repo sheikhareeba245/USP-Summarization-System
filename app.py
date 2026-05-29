@@ -34,7 +34,18 @@ def create_app():
         print("Summarize blueprint registered!")
     except Exception as e:
         print(f"Summarize blueprint ERROR: {e}")
+
+    try:
+        from routes.library import library
+        app.register_blueprint(library)
+        print("Library blueprint registered!")
+    except Exception as e:
+        print(f"Library blueprint ERROR: {e}")
     
+
+
+
+
     with app.app_context():
         from models.user import User
         from models.document import Document

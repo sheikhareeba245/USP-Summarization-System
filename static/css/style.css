@@ -592,3 +592,137 @@ body {
 
 .btn-full:hover { background: #2e75b6; }
 .btn-outline:hover { background: #f0f4ff; }
+
+.library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.library-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.2s;
+}
+
+.library-card:hover { transform: translateY(-2px); }
+
+.lib-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.lib-doc-name {
+    font-weight: bold;
+    font-size: 14px;
+    color: #1a3a6b;
+    flex: 1;
+    word-break: break-word;
+}
+
+.lib-badges { display: flex; gap: 4px; flex-shrink: 0; }
+
+.badge-mode {
+    background: #e8f0fe;
+    color: #1a3a6b;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+.badge-length {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+.lib-preview {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.6;
+    flex: 1;
+}
+
+.lib-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.lib-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #888;
+}
+
+.lib-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.btn-lib-view {
+    background: #1a3a6b;
+    color: white;
+    padding: 7px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    flex: 1;
+    text-align: center;
+}
+
+.btn-lib-download {
+    background: #2e75b6;
+    color: white;
+    padding: 7px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    flex: 1;
+    text-align: center;
+}
+
+.btn-lib-delete {
+    background: #fee;
+    color: #c00;
+    border: 1px solid #fcc;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.btn-lib-delete:hover { background: #fcc; }
+
+.empty-library {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.empty-icon { font-size: 60px; margin-bottom: 15px; }
+
+.empty-library h3 {
+    color: #1a3a6b;
+    margin-bottom: 8px;
+}
+
+.empty-library p {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 20px;
+}

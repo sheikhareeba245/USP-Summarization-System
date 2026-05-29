@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}My Library — USP Summarization{% endblock %}
+
+{% block content %}
+
+<nav class="navbar">
+    <div class="nav-brand"><strong>USP Summarization System</strong></div>
+    <div class="nav-links">
+        <span class="nav-user">{{ session.user_name }}</span>
+        <a href="/dashboard" class="btn-nav">Dashboard</a>
+        <a href="/upload" class="btn-nav">New Document</a>
+        <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+
+    <div class="page-header">
+        <h2>My Summary Library</h2>
+        <p>{{ total }} summaries saved</p>
+    </div>
+
+    {% if items %}
+
+        <div class="library-grid">
+            {% for item in items %}
+            <div class="library-card">
+
+                <div class="lib-card-header">
+                    <div class="lib-doc-name">📄 {{ item.doc_name }}</div>
+                    <div class="lib-badges">
+                        <span class="badge badge-mode">{{ item.mode | capitalize }}</span>
+                        <span class="badge badge-length">{{ item.length | capitalize }}</span>
+                    </div>
+                </div>
+
+                <div class="lib-preview">
+                    {{ item.preview }}
+                </div>
+
+                {% if item.keywords %}
+                <div class="lib-keywords">
+                    {% for kw in item.keywords.split(', ')[:4] %}
+                        <span class="keyword-tag">{{ kw }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="lib-meta">
+                    <span>📅 {{ item.generated_date.strftime('%d %b %Y') }}</span>
+                    {% if item.rating %}
+                        <span>
+                            {% for i in range(item.rating) %}★{% endfor %}
+                            {% for i in range(5 - item.rating) %}☆{% endfor %}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="lib-actions">
+                    <a href="/library/view/{{ item.summary_id }}" class="btn-lib-view">
+                        View
+                    </a>
+                    <a href="/download/{{ item.summary_id }}" class="btn-lib-download">
+                        Download
+                    </a>
+                    <form method="POST" action="/library/delete/{{ item.summary_id }}"
+                          onsubmit="return confirm('Delete this summary?')"
+                          style="display:inline;">
+                        <button type="submit" class="btn-lib-delete">Delete</button>
+                    </form>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+
+        <div class="empty-library">
+            <div class="empty-icon">📚</div>
+            <h3>No summaries yet</h3>
+            <p>Upload a document to generate your first summary</p>
+            <a href="/upload" class="btn-action">Upload Document</a>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
