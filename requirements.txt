@@ -1,0 +1,9 @@
+flask
+flask-sqlalchemy
+werkzeug
+pymupdf
+python-docx
+sumy
+keybert
+nltk
+reportlab
