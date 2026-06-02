@@ -44,7 +44,7 @@ Login is done using your existing USP LMS credentials no new registration requir
 ChatGPT is a generative model. When you ask it to summarize without a strict expert-level prompt, it blends your document content with its training data and invents information that was never in your document. This is called hallucination.
 
 **Proof:**
-Maynez et al. (2020) — *On Faithfulness and Factuality in Abstractive Summarization* found that over 70% of abstractive summaries contain hallucinated content, and over 90% of extrinsic hallucinations are factually incorrect.
+Maynez et al. (2020) *On Faithfulness and Factuality in Abstractive Summarization* found that over 70% of abstractive summaries contain hallucinated content, and over 90% of extrinsic hallucinations are factually incorrect.
 Bang et al. (2023) *A Multitask, Multilingual, Multimodal Evaluation of ChatGPT* found that ChatGPT fails to answer truthfully 35.38% of the time.
 
 Our system uses **LexRank** a graph-based extractive algorithm that scores and selects existing sentences from your document. Nothing is generated. Nothing is invented.
@@ -110,6 +110,10 @@ summarization_system/
 │
 └── uploads/                # Uploaded documents
 
+## Folder Structure
+
+![Folder] (docs/diagrams/folder structure diagram.png)
+
 ## Installation
 
 **Clone the repository:**
@@ -159,9 +163,9 @@ Password: usp2021it001
 
 This project is backed by peer-reviewed research:
 
-1. **Maynez et al. (2020)** — On Faithfulness and Factuality in Abstractive Summarization. *ACL 2020*. Proves 70%+ hallucination rate in abstractive models.
+1. **Maynez et al. (2020)** On Faithfulness and Factuality in Abstractive Summarization. *ACL 2020*. Proves 70%+ hallucination rate in abstractive models.
 
-2. **Bang et al. (2023)** — A Multitask, Multilingual, Multimodal Evaluation of ChatGPT. *AACL 2023*. Proves ChatGPT fails truthfully 35.38% of the time.
+2. **Bang et al. (2023)** A Multitask, Multilingual, Multimodal Evaluation of ChatGPT. *AACL 2023*. Proves ChatGPT fails truthfully 35.38% of the time.
 
 ---
 
