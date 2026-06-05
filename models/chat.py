@@ -1,5 +1,6 @@
-from extensions import db
+"""Chat model for USP Summarization System."""
 from datetime import datetime
+from extensions import db
 class Chat(db.Model):
     __tablename__ = 'chats'
     chat_id = db.Column(db.Integer, primary_key=True, autoincrement=True)

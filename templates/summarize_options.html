@@ -14,96 +14,393 @@
 
 <div class="page-wrapper">
 
-    <div class="page-header">
-        <h2>Summary Options</h2>
-        <p>Choose how you want to summarize your document</p>
-    </div>
+    <!-- Options Section -->
+    <div id="optionsSection">
 
-    <div class="doc-info-card">
-        <span>📄 <strong>{{ doc_name }}</strong></span>
-        <span>Words: <strong>{{ word_count }}</strong></span>
-        <span>Size: <strong>{{ file_size }}</strong></span>
-    </div>
+        <div class="page-header">
+            <h2>Summary Options</h2>
+            <p>Choose how you want to summarize your document</p>
+        </div>
 
-    <form method="POST" action="/generate-summary">
+        <div class="doc-info-card">
+            <span>📄 <strong>{{ doc_name }}</strong></span>
+            <span>Words: <strong>{{ word_count }}</strong></span>
+            <span>Size: <strong>{{ file_size }}</strong></span>
+        </div>
 
-        <div class="options-grid">
+        <form method="POST" action="/generate-summary" id="summaryForm">
 
-            <div class="option-card">
-                <h3>Summarization Mode</h3>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="mode" value="academic" checked>
-                        <span>
-                            <strong>Academic Mode</strong>
-                            <small>Structured output Abstract, Methodology, Findings, Conclusion</small>
-                        </span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="mode" value="general">
-                        <span>
-                            <strong>General Mode</strong>
-                            <small>Standard summary for articles and reports</small>
-                        </span>
-                    </label>
+            <div class="options-grid">
+
+                <div class="option-card">
+                    <h3>Summarization Mode</h3>
+                    <div class="radio-group">
+                        <label class="radio-option" id="label-academic">
+                            <input type="radio" name="mode" value="academic" checked>
+                            <span>
+                                <strong>Academic Mode</strong>
+                                <small>Structured output Abstract, Methodology, Findings, Conclusion</small>
+                            </span>
+                        </label>
+                        <label class="radio-option" id="label-general">
+                            <input type="radio" name="mode" value="general">
+                            <span>
+                                <strong>General Mode</strong>
+                                <small>Standard summary for articles and reports</small>
+                            </span>
+                        </label>
+                    </div>
                 </div>
+
+                <div class="option-card">
+                    <h3>Output Format</h3>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="format" value="paragraph" checked>
+                            <span>
+                                <strong>Paragraph</strong>
+                                <small>Flowing narrative summary</small>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="format" value="bullets">
+                            <span>
+                                <strong>Bullet Points</strong>
+                                <small>Quick reference key points</small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="option-card">
+                    <h3>Summary Length</h3>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="length" value="short">
+                            <span>
+                                <strong>Short</strong>
+                                <small>10-15% of original</small>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="length" value="medium" checked>
+                            <span>
+                                <strong>Medium</strong>
+                                <small>20-30% of original</small>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="length" value="detailed">
+                            <span>
+                                <strong>Detailed</strong>
+                                <small>35-50% of original</small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="option-card">
-                <h3>Output Format</h3>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="format" value="paragraph" checked>
-                        <span>
-                            <strong>Paragraph</strong>
-                            <small>Flowing narrative summary</small>
-                        </span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="format" value="bullets">
-                        <span>
-                            <strong>Bullet Points</strong>
-                            <small>Quick reference key points</small>
-                        </span>
-                    </label>
-                </div>
+            <button type="submit" class="btn-generate" id="generateBtn">
+                Generate Summary
+            </button>
+
+        </form>
+    </div>
+
+    <!-- Loading Section — hidden initially -->
+    <div id="loadingSection" style="display:none;">
+
+        <div class="loading-wrapper">
+
+            <div class="loading-header">
+                <h2>Generating Your Summary</h2>
+                <p id="loadingSubtitle">Please wait while we analyze your document...</p>
             </div>
 
-            <div class="option-card">
-                <h3>Summary Length</h3>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="length" value="short">
-                        <span>
-                            <strong>Short</strong>
-                            <small>10-15% of original</small>
-                        </span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="length" value="medium" checked>
-                        <span>
-                            <strong>Medium</strong>
-                            <small>20-30% of original</small>
-                        </span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="length" value="detailed">
-                        <span>
-                            <strong>Detailed</strong>
-                            <small>35-50% of original</small>
-                        </span>
-                    </label>
+            <div class="loading-doc-info">
+                <span>📄 <strong>{{ doc_name }}</strong></span>
+                <span id="selectedMode" style="display:none;"></span>
+            </div>
+
+            <!-- Animated Progress Bar -->
+            <div class="progress-bar-wrapper">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <p class="progress-percent" id="progressPercent">0%</p>
+
+            <!-- Steps -->
+            <div class="steps-container">
+
+                <div class="step-item" id="stepItem1">
+                    <div class="step-icon" id="stepIcon1">
+                        <div class="step-spinner"></div>
+                    </div>
+                    <div class="step-text">
+                        <strong>Reading Document</strong>
+                        <small>Fetching document from database</small>
+                    </div>
                 </div>
+
+                <div class="step-item step-waiting" id="stepItem2">
+                    <div class="step-icon waiting" id="stepIcon2">2</div>
+                    <div class="step-text">
+                        <strong>Analyzing Text</strong>
+                        <small>Breaking document into sentences</small>
+                    </div>
+                </div>
+
+                <div class="step-item step-waiting" id="stepItem3">
+                    <div class="step-icon waiting" id="stepIcon3">3</div>
+                    <div class="step-text">
+                        <strong>Extracting Key Points</strong>
+                        <small>LexRank algorithm scoring sentences</small>
+                    </div>
+                </div>
+
+                <div class="step-item step-waiting" id="stepItem4">
+                    <div class="step-icon waiting" id="stepIcon4">4</div>
+                    <div class="step-text">
+                        <strong>Identifying Keywords</strong>
+                        <small>KeyBERT extracting important terms</small>
+                    </div>
+                </div>
+
+                <div class="step-item step-waiting" id="stepItem5">
+                    <div class="step-icon waiting" id="stepIcon5">5</div>
+                    <div class="step-text">
+                        <strong>Saving to Library</strong>
+                        <small>Storing summary in your personal library</small>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="loading-note">
+                <p>All processing is done locally — your document never leaves our server.</p>
             </div>
 
         </div>
 
-        <button type="submit" class="btn-generate">
-            Generate Summary
-        </button>
-
-    </form>
+    </div>
 
 </div>
+
+<style>
+.loading-wrapper {
+    max-width: 600px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.loading-header h2 {
+    color: #1a3a6b;
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.loading-header p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.loading-doc-info {
+    background: #f0f7ff;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 25px;
+    font-size: 13px;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.progress-bar-wrapper {
+    background: #e8f0fe;
+    border-radius: 20px;
+    height: 10px;
+    margin-bottom: 6px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #1a3a6b, #2e75b6);
+    border-radius: 20px;
+    width: 0%;
+    transition: width 0.8s ease;
+}
+
+.progress-percent {
+    font-size: 13px;
+    color: #2e75b6;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.steps-container {
+    text-align: left;
+    margin-bottom: 25px;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s;
+}
+
+.step-item:last-child {
+    border-bottom: none;
+}
+
+.step-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #1a3a6b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.step-icon.waiting {
+    background: #e8f0fe;
+    color: #999;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.step-icon.done {
+    background: #2e7d32;
+    color: white;
+    font-size: 16px;
+}
+
+.step-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.step-item.step-waiting .step-text strong {
+    color: #999;
+}
+
+.step-item.step-waiting .step-text small {
+    color: #bbb;
+}
+
+.step-item.step-active .step-text strong {
+    color: #1a3a6b;
+}
+
+.step-item.step-done .step-text strong {
+    color: #2e7d32;
+}
+
+.loading-note {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+    color: #888;
+}
+
+@keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+const STEP_TIMINGS = [
+    { id: 1, duration: 800,  progress: 15 },
+    { id: 2, duration: 1500, progress: 35 },
+    { id: 3, duration: 2500, progress: 65 },
+    { id: 4, duration: 2000, progress: 85 },
+    { id: 5, duration: 800,  progress: 98 }
+];
+
+function setStepDone(stepId) {
+    const item = document.getElementById('stepItem' + stepId);
+    const icon = document.getElementById('stepIcon' + stepId);
+    item.classList.remove('step-waiting', 'step-active');
+    item.classList.add('step-done');
+    icon.classList.remove('waiting');
+    icon.classList.add('done');
+    icon.innerHTML = '✓';
+}
+
+function setStepActive(stepId) {
+    const item = document.getElementById('stepItem' + stepId);
+    const icon = document.getElementById('stepIcon' + stepId);
+    item.classList.remove('step-waiting');
+    item.classList.add('step-active');
+    icon.classList.remove('waiting');
+    icon.innerHTML = '<div class="step-spinner"></div>';
+}
+
+function updateProgress(percent) {
+    document.getElementById('progressBar').style.width = percent + '%';
+    document.getElementById('progressPercent').textContent = percent + '%';
+}
+
+function runSteps() {
+    let currentStep = 0;
+    let elapsed = 0;
+
+    setStepActive(1);
+    updateProgress(5);
+
+    function nextStep() {
+        if (currentStep >= STEP_TIMINGS.length) return;
+
+        const step = STEP_TIMINGS[currentStep];
+
+        setTimeout(() => {
+            setStepDone(step.id);
+            updateProgress(step.progress);
+
+            currentStep++;
+
+            if (currentStep < STEP_TIMINGS.length) {
+                setStepActive(STEP_TIMINGS[currentStep].id);
+                nextStep();
+            }
+        }, step.duration);
+    }
+
+    nextStep();
+}
+
+document.getElementById('summaryForm').addEventListener('submit', function(e) {
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+    const length = document.querySelector('input[name="length"]:checked').value;
+
+    document.getElementById('optionsSection').style.display = 'none';
+    document.getElementById('loadingSection').style.display = 'block';
+
+    document.getElementById('loadingSubtitle').textContent =
+        mode.charAt(0).toUpperCase() + mode.slice(1) +
+        ' Mode — ' +
+        length.charAt(0).toUpperCase() + length.slice(1) +
+        ' length selected';
+
+    runSteps();
+});
+</script>
 
 {% endblock %}

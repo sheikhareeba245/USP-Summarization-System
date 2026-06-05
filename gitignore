@@ -6,3 +6,5 @@ uploads/
 .env
 *.sqlite
 *.db
+# Ignore KeyBERT model weights and folder
+models/keybert_model/

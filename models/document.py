@@ -1,5 +1,6 @@
-from extensions import db
+"""Document model for USP Summarization System."""
 from datetime import datetime
+from extensions import db
 
 class Document(db.Model):
     __tablename__ = 'documents'

@@ -70,48 +70,6 @@ Our system uses **LexRank** a graph-based extractive algorithm that scores and s
 
 ## Project Structure
 
-summarization_system/
-├── app.py                  # Application entry point
-├── config.py               # Configuration settings
-├── extensions.py           # SQLAlchemy instance
-├── seed_users.py           # Mock LMS user data
-├── requirements.txt        # Dependencies
-│
-├── models/
-│   ├── user.py             # User model
-│   ├── document.py         # Document model
-│   ├── summary.py          # Summary model
-│   └── chat.py             # Chat model
-│
-├── routes/
-│   ├── auth.py             # Login, logout, dashboard
-│   ├── upload.py           # Document upload
-│   ├── summarize.py        # Summary generation, download
-│   └── library.py          # Summary library management
-│
-├── utils/
-│   ├── extractor.py        # Text extraction — PDF, DOCX, TXT
-│   ├── summarizer.py       # LexRank summarization
-│   └── keywords.py         # KeyBERT keyword extraction
-│
-├── templates/
-│   ├── base.html
-│   ├── login.html
-│   ├── dashboard.html
-│   ├── upload.html
-│   ├── summarize_options.html
-│   ├── result.html
-│   ├── library.html
-│   └── summary_detail.html
-│
-├── static/
-│   ├── css/style.css
-│   └── js/main.js
-│
-└── uploads/                # Uploaded documents
-
-## Folder Structure
-
 ![Folder] (docs/diagrams/folder structure diagram.png)
 
 ## Installation

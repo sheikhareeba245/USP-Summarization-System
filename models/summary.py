@@ -1,5 +1,6 @@
-from extensions import db
+"""Summary model for USP Summarization System."""
 from datetime import datetime
+from extensions import db
 
 class Summary(db.Model):
     __tablename__ = 'summaries'
