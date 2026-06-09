@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Chat with Document — USP Summarization{% endblock %}
+
+{% block content %}
+
+<nav class="navbar">
+    <div class="nav-brand"><strong>USP Summarization System</strong></div>
+    <div class="nav-links">
+        <span class="nav-user">{{ session.user_name }}</span>
+        <a href="/dashboard" class="btn-nav">Dashboard</a>
+        <a href="/library" class="btn-nav">Library</a>
+        <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+
+    {% if not selected_doc %}
+
+    <div class="page-header">
+        <h2>💬 Chat with Document</h2>
+        <p>Select a document to start chatting</p>
+    </div>
+
+    {% if documents %}
+        <div class="doc-select-grid">
+            {% for doc in documents %}
+            <div class="doc-select-card" onclick="selectDoc({{ doc.document_id }}, '{{ doc.filename }}')">
+                <div class="doc-select-icon">📄</div>
+                <div class="doc-select-info">
+                    <strong>{{ doc.filename }}</strong>
+                    <small>{{ doc.upload_date.strftime('%d %b %Y') }}</small>
+                    <small>{{ doc.filetype.upper() }}</small>
+                </div>
+                <div class="doc-select-arrow">→</div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-library">
+            <div class="empty-icon">📄</div>
+            <h3>No documents yet</h3>
+            <p>Upload a document first to start chatting</p>
+            <a href="/upload" class="btn-action">Upload Document</a>
+        </div>
+    {% endif %}
+
+    {% else %}
+
+    <div class="chat-page-wrapper">
+
+        <div class="chat-page-header">
+            <div>
+                <h2>💬 Chat with Document</h2>
+                <p>📄 <strong>{{ selected_doc.filename }}</strong></p>
+            </div>
+            <a href="/chat-page" class="btn-nav">Change Document</a>
+        </div>
+
+        <div class="chat-messages" id="chatMessages" style="height:400px;">
+            <div class="chat-welcome">
+                <p>👋 Ask me anything about <strong>{{ selected_doc.filename }}</strong></p>
+                <div class="sample-questions">
+                    <span onclick="askSample(this)">What is this document about?</span>
+                    <span onclick="askSample(this)">What are the main points?</span>
+                    <span onclick="askSample(this)">What is the most important information?</span>
+                    <span onclick="askSample(this)">Summarize the key ideas</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input
+                type="text"
+                id="chatInput"
+                placeholder="Ask a question about this document..."
+                onkeypress="if(event.key==='Enter') sendQuestion()"
+            >
+            <button onclick="sendQuestion()" id="chatSendBtn">Send</button>
+        </div>
+
+    </div>
+
+    <script>
+    const DOC_ID = {{ selected_doc.document_id }};
+
+    function askSample(el) {
+        document.getElementById('chatInput').value = el.textContent;
+        sendQuestion();
+    }
+
+    function sendQuestion() {
+        const input = document.getElementById('chatInput');
+        const question = input.value.trim();
+        if (!question) return;
+
+        const messagesDiv = document.getElementById('chatMessages');
+
+        const userMsg = document.createElement('div');
+        userMsg.className = 'chat-msg user-msg';
+        userMsg.innerHTML = `
+            <div class="msg-bubble user-bubble"><p>${question}</p></div>
+            <div class="msg-time">You</div>
+        `;
+        messagesDiv.appendChild(userMsg);
+
+        const typingMsg = document.createElement('div');
+        typingMsg.className = 'chat-msg bot-msg';
+        typingMsg.id = 'typingIndicator';
+        typingMsg.innerHTML = `
+            <div class="msg-bubble bot-bubble typing">
+                <span></span><span></span><span></span>
+            </div>
+        `;
+        messagesDiv.appendChild(typingMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        input.value = '';
+        document.getElementById('chatSendBtn').disabled = true;
+
+        fetch('/chat', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                question: question,
+                doc_id: DOC_ID
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('typingIndicator').remove();
+            const botMsg = document.createElement('div');
+            botMsg.className = 'chat-msg bot-msg';
+            botMsg.innerHTML = `
+                <div class="msg-bubble bot-bubble"><p>${data.answer}</p></div>
+                <div class="msg-time">USP Assistant</div>
+            `;
+            messagesDiv.appendChild(botMsg);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            document.getElementById('chatSendBtn').disabled = false;
+        });
+    }
+    </script>
+
+    {% endif %}
+
+</div>
+
+<script>
+function selectDoc(docId, docName) {
+    window.location.href = '/chat-page/' + docId;
+}
+</script>
+
+{% endblock %}

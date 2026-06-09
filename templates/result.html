@@ -72,6 +72,106 @@
                 <a href="/download/{{ summary_id }}" class="btn-action">Download PDF</a>
             </div>
         </div>
+        <!-- Chat with Document -->
+<div class="chat-section" id="chatSection">
+
+    <div class="chat-header">
+        <h3>💬 Chat with Document</h3>
+        <p>Ask questions about your uploaded document</p>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+        <div class="chat-welcome">
+            <p>👋 Hi! Ask me anything about <strong>{{ doc_name }}</strong></p>
+            <div class="sample-questions">
+                {% for q in sample_questions %}
+                <span onclick="askSample(this)">{{q}}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-input-area">
+        <input
+            type="text"
+            id="chatInput"
+            placeholder="Ask a question about this document..."
+            onkeypress="if(event.key==='Enter') sendQuestion()"
+        >
+        <button onclick="sendQuestion()" id="chatSendBtn">
+            Send
+        </button>
+    </div>
+
+</div>
+
+<script>
+function askSample(el) {
+    document.getElementById('chatInput').value = el.textContent;
+    sendQuestion();
+}
+
+function sendQuestion() {
+    const input = document.getElementById('chatInput');
+    const question = input.value.trim();
+    if (!question) return;
+
+    const messagesDiv = document.getElementById('chatMessages');
+
+    // User message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'chat-msg user-msg';
+    userMsg.innerHTML = `
+        <div class="msg-bubble user-bubble">
+            <p>${question}</p>
+        </div>
+        <div class="msg-time">You</div>
+    `;
+    messagesDiv.appendChild(userMsg);
+
+    // Typing indicator
+    const typingMsg = document.createElement('div');
+    typingMsg.className = 'chat-msg bot-msg';
+    typingMsg.id = 'typingIndicator';
+    typingMsg.innerHTML = `
+        <div class="msg-bubble bot-bubble typing">
+            <span></span><span></span><span></span>
+        </div>
+    `;
+    messagesDiv.appendChild(typingMsg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    input.value = '';
+    document.getElementById('chatSendBtn').disabled = true;
+
+    // API call
+    fetch('/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({question: question})
+    })
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('typingIndicator').remove();
+
+        const botMsg = document.createElement('div');
+        botMsg.className = 'chat-msg bot-msg';
+        botMsg.innerHTML = `
+            <div class="msg-bubble bot-bubble">
+                <p>${data.answer}</p>
+            </div>
+            <div class="msg-time">USP Assistant</div>
+        `;
+        messagesDiv.appendChild(botMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        document.getElementById('chatSendBtn').disabled = false;
+    })
+    .catch(() => {
+        document.getElementById('typingIndicator').remove();
+        document.getElementById('chatSendBtn').disabled = false;
+    });
+}
+</script>
 
         <!-- Keywords Section -->
         <div class="side-panel">

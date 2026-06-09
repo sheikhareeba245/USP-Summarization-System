@@ -64,7 +64,7 @@ def extract_keywords(text, top_n=8):
 
     words=text.split()
     if len(words)>1500:
-        text=''.join(words[:1500])
+        text=' '.join(words[:1500])
     try:
         model = get_kw_model()
 
@@ -82,7 +82,15 @@ def extract_keywords(text, top_n=8):
         )
 
         all_kws = [kw[0] for kw in keywords_1 + keywords_2]
-        return _deduplicate(all_kws, top_n)
+        cleaned=_deduplicate(all_kws,top_n)
+
+        final=[]
+        for kw in cleaned:
+            kw=' '.join(kw.split())
+            kw=kw.strip()
+            if kw:
+                final.append(kw)
+        return final
 
     except (RuntimeError, ValueError) as e:
         print(f"Keyword error: {e}")

@@ -4,6 +4,7 @@ from extensions import db
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 import sqlite3
+import os
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -32,7 +33,7 @@ def create_app():
     app.register_blueprint(upload)
     print("Upload blueprint registered!")
 
-    # 2. Summarize Blueprint (Yahan agar error hoga to Flask start nahi hoga aur error show karega)
+    # 2. Summarize Blueprint
     from routes.summarize import summarize
     app.register_blueprint(summarize)
     print("Summarize blueprint registered!")
@@ -41,6 +42,13 @@ def create_app():
     from routes.library import library
     app.register_blueprint(library)
     print("Library blueprint registered!")
+
+    try:
+     from routes.chat import chat_bp
+     app.register_blueprint(chat_bp)
+     print("Chat blueprint registered!")
+    except Exception as e:
+     print(f"Chat blueprint ERROR: {e}")
 
     with app.app_context():
         from models.user import User
@@ -55,4 +63,5 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() in ['true', '1']
+    app.run(debug=debug_mode)
