@@ -43,6 +43,7 @@ def create_app():
     app.register_blueprint(library)
     print("Library blueprint registered!")
 
+    # Chat Blueprint
     try:
      from routes.chat import chat_bp
      app.register_blueprint(chat_bp)

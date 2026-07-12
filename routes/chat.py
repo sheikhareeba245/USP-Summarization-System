@@ -1,4 +1,4 @@
-"""Chat with Document — extractive QA routes."""
+"""Chat with Document extractive QA and AI assistant routes."""
 import re
 from functools import wraps
 from flask import (
@@ -35,7 +35,7 @@ def find_relevant_sentences(question, document_text, top_n=3):
     ]
 
     if not sentences:
-        return []
+        return [], 0.0
 
     try:
         vectorizer = TfidfVectorizer(stop_words='english')
@@ -50,12 +50,15 @@ def find_relevant_sentences(question, document_text, top_n=3):
         )[0]
 
         top_indices = similarities.argsort()[-top_n:][::-1]
+        best_score = float(similarities[top_indices[0]])
 
-        return [
+        relevant = [
             sentences[i]
             for i in top_indices
             if similarities[i] > 0.1
         ]
+
+        return relevant, best_score
 
     except (ValueError, RuntimeError):
         question_words = set(
@@ -74,7 +77,7 @@ def find_relevant_sentences(question, document_text, top_n=3):
                 scored.append((score, sentence))
 
         scored.sort(key=lambda x: x[0], reverse=True)
-        return [s[1] for s in scored[:top_n]]
+        return [s[1] for s in scored[:top_n]], 0.0
 
 
 @chat_bp.route('/chat-page')
@@ -113,7 +116,7 @@ def chat_with_doc(doc_id):
 @chat_bp.route('/chat', methods=['POST'])
 @login_required
 def ask_question():
-    """Handle chat question and return extractive answer."""
+    """Handle chat question — extractive answer."""
     data = request.get_json()
     question = data.get('question', '').strip()
     doc_id = data.get('doc_id') or session.get('current_doc_id')
@@ -137,19 +140,18 @@ def ask_question():
             'answer': 'Document not found in database.'
         })
 
-    relevant = find_relevant_sentences(
+    relevant, score = find_relevant_sentences(
         question,
         document.extracted_text,
         top_n=3
     )
 
     if not relevant:
-        answer = (
-            "Sorry, I could not find relevant information "
-            "for your question in this document."
-        )
+        answer = "Sorry, I could not find relevant information for your question in this document."
+        show_ai_button = True
     else:
         answer = ' '.join(relevant)
+        show_ai_button = True
 
     chat_record = Chat(
         document_id=doc_id,
@@ -162,7 +164,56 @@ def ask_question():
     return jsonify({
         'status': 'success',
         'answer': answer,
-        'chat_id': chat_record.chat_id
+        'show_ai_button': show_ai_button,
+        'chat_id': chat_record.chat_id,
+        'method': 'extractive'
+    })
+
+
+@chat_bp.route('/chat/ai', methods=['POST'])
+@login_required
+def ask_ai():
+    """Handle AI assistant question using Ollama."""
+    from utils.ollama_chat import generate_ai_answer, is_ollama_running
+
+    data = request.get_json()
+    question = data.get('question', '').strip()
+    doc_id = data.get('doc_id') or session.get('current_doc_id')
+
+    if not question or not doc_id:
+        return jsonify({
+            'status': 'error',
+            'answer': 'Invalid request.'
+        })
+
+    if not is_ollama_running():
+        return jsonify({
+            'status': 'error',
+            'answer': 'AI Assistant is not available. Please make sure Ollama is running.'
+        })
+
+    document = Document.query.get(doc_id)
+    if not document:
+        return jsonify({
+            'status': 'error',
+            'answer': 'Document not found.'
+        })
+
+    result = generate_ai_answer(question, document.extracted_text)
+
+    if result['success']:
+        chat_record = Chat(
+            document_id=doc_id,
+            question=f"[AI] {question}",
+            answer=result['answer']
+        )
+        db.session.add(chat_record)
+        db.session.commit()
+
+    return jsonify({
+        'status': 'success' if result['success'] else 'error',
+        'answer': result['answer'],
+        'method': 'ai_generated'
     })
 
 

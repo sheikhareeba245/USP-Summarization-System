@@ -189,6 +189,7 @@ def generate_summary():
         keywords=keywords,
         summary_id=new_summary.summary_id,
         is_academic=(mode == 'academic'),
+        # doc_id=doc_id,
         sample_questions=SAMPLE_QUESTIONS[mode]
     )
 

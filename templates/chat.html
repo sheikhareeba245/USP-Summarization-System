@@ -96,24 +96,8 @@
 
         const messagesDiv = document.getElementById('chatMessages');
 
-        const userMsg = document.createElement('div');
-        userMsg.className = 'chat-msg user-msg';
-        userMsg.innerHTML = `
-            <div class="msg-bubble user-bubble"><p>${question}</p></div>
-            <div class="msg-time">You</div>
-        `;
-        messagesDiv.appendChild(userMsg);
-
-        const typingMsg = document.createElement('div');
-        typingMsg.className = 'chat-msg bot-msg';
-        typingMsg.id = 'typingIndicator';
-        typingMsg.innerHTML = `
-            <div class="msg-bubble bot-bubble typing">
-                <span></span><span></span><span></span>
-            </div>
-        `;
-        messagesDiv.appendChild(typingMsg);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        appendMessage(messagesDiv, question, 'user');
+        showTyping(messagesDiv);
         input.value = '';
         document.getElementById('chatSendBtn').disabled = true;
 
@@ -127,18 +111,103 @@
         })
         .then(r => r.json())
         .then(data => {
-            document.getElementById('typingIndicator').remove();
-            const botMsg = document.createElement('div');
-            botMsg.className = 'chat-msg bot-msg';
-            botMsg.innerHTML = `
-                <div class="msg-bubble bot-bubble"><p>${data.answer}</p></div>
-                <div class="msg-time">USP Assistant</div>
-            `;
-            messagesDiv.appendChild(botMsg);
+            hideTyping();
+            appendMessage(messagesDiv, data.answer, 'bot', 'extractive');
+
+            if (data.show_ai_button) {
+                appendAIButton(messagesDiv, question);
+            }
+
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
             document.getElementById('chatSendBtn').disabled = false;
         });
     }
+
+    function appendMessage(container, text, type, method) {
+        const div = document.createElement('div');
+        div.className = `chat-msg ${type}-msg`;
+
+        const badge = method === 'extractive'
+            ? '<span class="method-badge extractive-badge">📄 From Document</span>'
+            : method === 'ai_generated'
+            ? '<span class="method-badge ai-badge">✨ AI Generated</span>'
+            : '';
+
+        if (type === 'user') {
+            div.innerHTML = `
+                <div class="msg-bubble user-bubble"><p>${text}</p></div>
+                <div class="msg-time">You</div>
+            `;
+        } else {
+            div.innerHTML = `
+                <div class="msg-bubble bot-bubble">
+                    ${badge}
+                    <p>${text}</p>
+                </div>
+                <div class="msg-time">USP Assistant</div>
+            `;
+        }
+
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function appendAIButton(container, question) {
+        const div = document.createElement('div');
+        div.className = 'ai-suggest-div';
+        div.innerHTML = `
+            <div class="ai-suggest-card">
+                <span>🤔 Not fully satisfied?</span>
+                <button class="btn-ai-ask" onclick="askAI('${question.replace(/'/g, "\\'")}', this)">
+                    ✨ Ask AI Assistant
+                </button>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function askAI(question, btn) {
+        btn.disabled = true;
+        btn.textContent = 'Thinking...';
+
+        const messagesDiv = document.getElementById('chatMessages');
+        showTyping(messagesDiv);
+
+        fetch('/chat/ai', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                question: question,
+                doc_id: DOC_ID
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            hideTyping();
+            appendMessage(messagesDiv, data.answer, 'bot', 'ai_generated');
+            btn.closest('.ai-suggest-div').remove();
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
+    }
+
+    function showTyping(container) {
+        const div = document.createElement('div');
+        div.className = 'chat-msg bot-msg';
+        div.id = 'typingIndicator';
+        div.innerHTML = `
+            <div class="msg-bubble bot-bubble typing">
+                <span></span><span></span><span></span>
+            </div>
+        `;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function hideTyping() {
+        const t = document.getElementById('typingIndicator');
+        if (t) t.remove();
+    }
+
     </script>
 
     {% endif %}

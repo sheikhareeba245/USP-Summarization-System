@@ -1,4 +1,4 @@
-/* /* /* * {
+ * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -875,11 +875,17 @@ body {
 
 .chat-input-area {
     display: flex;
+    flex-direction: row;
     gap: 10px;
+    align-items: center;
+    padding: 10px 0 0 0;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
 }
 
 .chat-input-area input {
     flex: 1;
+    min-width: 0;
     padding: 12px 16px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -896,10 +902,12 @@ body {
     background: #1a3a6b;
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 12px 20px;
     border-radius: 8px;
     font-size: 14px;
     cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
     transition: background 0.2s;
 }
 
@@ -910,6 +918,10 @@ body {
 .chat-input-area button:disabled {
     background: #aaa;
     cursor: not-allowed;
+}
+
+.ai-suggest-div {
+    padding: 4px 0;
 }
 
 .doc-select-grid {
@@ -984,4 +996,76 @@ body {
 .chat-page-header p {
     color: #666;
     font-size: 13px;
+}
+
+.method-badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.extractive-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.ai-badge {
+    background: #e8f0fe;
+    color: #1a3a6b;
+}
+
+.ai-suggest-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff8e1;
+    border: 1px solid #f0a500;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 8px 0;
+    font-size: 13px;
+    color: #555;
+}
+
+.btn-ai-ask {
+    background: linear-gradient(135deg, #1a3a6b, #2e75b6);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+}
+
+.btn-ai-ask:hover { opacity: 0.85; }
+.btn-ai-ask:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Chat Input Fix ── */
+.chat-page-wrapper .chat-input-area {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
+}
+
+.chat-page-wrapper .chat-input-area input {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.chat-page-wrapper .chat-input-area button {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+}
+
+.ai-suggest-div {
+    padding: 4px 0;
 }
