@@ -1,18 +1,24 @@
-"""Summary generation, download and rating routes."""
+"""
+Summary generation, download and rating routes for USP Summarization System.
+Includes TA_JUSTIFY backend alignment for PDF download.
+"""
 import io
 import json
+import time
 from datetime import datetime
 from functools import wraps
-import time
 from flask import (
     Blueprint, render_template, request,
     redirect, url_for, session, flash,
     send_file, jsonify
 )
+
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+
 from extensions import db
 from models.summary import Summary
 from models.document import Document
@@ -20,7 +26,6 @@ from utils.summarizer import general_summary, academic_summary
 from utils.keywords import extract_keywords
 
 summarize = Blueprint('summarize', __name__)
-
 
 def login_required(f):
     """Decorator to protect routes that require login."""
@@ -32,81 +37,87 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated
 
-
 def build_pdf_story(summary, styles):
-    """Build ReportLab story list from summary object."""
-    title_style = ParagraphStyle(
-        'CustomTitle', parent=styles['Title'],
-        fontSize=16, spaceAfter=12
-    )
-    heading_style = ParagraphStyle(
-        'CustomHeading', parent=styles['Heading2'],
-        fontSize=12, spaceAfter=6, spaceBefore=12
-    )
-    body_style = ParagraphStyle(
-        'CustomBody', parent=styles['Normal'],
-        fontSize=10, spaceAfter=8, leading=16
-    )
-    meta_style = ParagraphStyle(
-        'Meta', parent=styles['Normal'],
-        fontSize=9, spaceAfter=4
-    )
-
-    document = Document.query.get(summary.document_id)
-    doc_name = document.filename if document else "Unknown"
-
-    story = []
-    story.append(Paragraph("USP AI Document Summarization System", title_style))
-    story.append(Spacer(1, 8))
-    story.append(Paragraph(f"Document: {doc_name}", meta_style))
-    story.append(Paragraph(f"Mode: {summary.mode.capitalize()} Mode", meta_style))
-    story.append(Paragraph(f"Length: {summary.length.capitalize()}", meta_style))
-    story.append(Paragraph(
-        f"Generated: {summary.generated_date.strftime('%B %d, %Y %I:%M %p')}",
-        meta_style
-    ))
-    story.append(Spacer(1, 16))
-
+    """Build ReportLab story list from summary object with TA_JUSTIFY alignment."""
     try:
-        summary_data = json.loads(summary.summary_text)
-        if isinstance(summary_data, dict):
-            for section, content in summary_data.items():
-                story.append(Paragraph(section.upper(), heading_style))
-                for line in content.split('\n'):
+        title_style = ParagraphStyle(
+            'CustomTitle', parent=styles['Title'],
+            fontName='Helvetica-Bold',
+            fontSize=16, leading=20, spaceAfter=12,
+            alignment=TA_CENTER, textColor='#1a3a6b'
+        )
+        heading_style = ParagraphStyle(
+            'CustomHeading', parent=styles['Heading2'],
+            fontName='Helvetica-Bold',
+            fontSize=12, leading=16, spaceAfter=6, spaceBefore=12,
+            textColor='#1a3a6b'
+        )
+
+        body_style = ParagraphStyle(
+            'CustomBody', parent=styles['Normal'],
+            fontName='Helvetica',
+            fontSize=10, leading=15, spaceAfter=8,
+            alignment=TA_JUSTIFY,
+            textColor='#1e293b'
+        )
+        meta_style = ParagraphStyle(
+            'Meta', parent=styles['Normal'],
+            fontName='Helvetica-Oblique',
+            fontSize=9, spaceAfter=4, textColor='#64748b'
+        )
+
+        document = Document.query.get(summary.document_id)
+        doc_name = document.filename if document else "Unknown"
+
+        story = []
+        story.append(Paragraph("USP AI Document Summarization System", title_style))
+        story.append(Spacer(1, 8))
+        story.append(Paragraph(f"Document: {doc_name}", meta_style))
+        story.append(Paragraph(f"Mode: {summary.mode.capitalize()} Mode", meta_style))
+        story.append(Paragraph(f"Length: {summary.length.capitalize()}", meta_style))
+        story.append(Paragraph(
+            f"Generated: {summary.generated_date.strftime('%B %d, %Y %I:%M %p')}",
+            meta_style
+        ))
+        story.append(Spacer(1, 16))
+
+        try:
+            summary_data = json.loads(summary.summary_text)
+            if isinstance(summary_data, dict):
+                for section, content in summary_data.items():
+                    story.append(Paragraph(section.upper(), heading_style))
+                    for line in content.split('\n'):
+                        if line.strip():
+                            safe = line.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                            story.append(Paragraph(safe, body_style))
+                    story.append(Spacer(1, 8))
+            else:
+                for line in str(summary_data).split('\n'):
                     if line.strip():
-                        safe = line.replace(
-                            '&', '&amp;'
-                        ).replace('<', '&lt;').replace('>', '&gt;')
+                        safe = line.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
                         story.append(Paragraph(safe, body_style))
-                story.append(Spacer(1, 8))
-        else:
-            for line in str(summary_data).split('\n'):
+        except (json.JSONDecodeError, ValueError):
+            for line in summary.summary_text.split('\n'):
                 if line.strip():
-                    safe = line.replace(
-                        '&', '&amp;'
-                    ).replace('<', '&lt;').replace('>', '&gt;')
+                    safe = line.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
                     story.append(Paragraph(safe, body_style))
-    except (json.JSONDecodeError, ValueError):
-        for line in summary.summary_text.split('\n'):
-            if line.strip():
-                safe = line.replace(
-                    '&', '&amp;'
-                ).replace('<', '&lt;').replace('>', '&gt;')
-                story.append(Paragraph(safe, body_style))
 
-    if summary.keywords:
-        story.append(Spacer(1, 12))
-        story.append(Paragraph("KEYWORDS", heading_style))
-        story.append(Paragraph(summary.keywords, body_style))
+        if summary.keywords:
+            story.append(Spacer(1, 12))
+            story.append(Paragraph("KEYWORDS", heading_style))
+            story.append(Paragraph(summary.keywords, body_style))
 
-    story.append(Spacer(1, 20))
-    story.append(Paragraph(
-        "Generated by USP AI Document Summarization System"
-        "  University of Southern Punjab",
-        meta_style
-    ))
+        story.append(Spacer(1, 20))
+        story.append(Paragraph(
+            "Generated by USP AI Document Summarization System — University of Southern Punjab",
+            meta_style
+        ))
 
-    return story, doc_name
+        return story, doc_name
+    except Exception as e:
+        print(f"Error in build_pdf_story: {e}")
+        story = [Paragraph("Summary Document", styles['Heading1'])]
+        return story, "Document"
 
 SAMPLE_QUESTIONS = {
     'academic': [
@@ -127,115 +138,124 @@ SAMPLE_QUESTIONS = {
 @login_required
 def generate_summary():
     """Generate summary from uploaded document."""
-    t1 = time.time()
-    doc_id = session.get('current_doc_id')
-    if not doc_id:
-        flash('Please upload a document first.', 'error')
+    try:
+        t1 = time.time()
+        doc_id = session.get('current_doc_id')
+        if not doc_id:
+            flash('Please upload a document first.', 'error')
+            return redirect(url_for('upload.upload_document'))
+
+        mode = request.form.get('mode', 'general')
+        output_format = request.form.get('format', 'paragraph')
+        length = request.form.get('length', 'medium')
+        doc_name = session.get('current_doc_name')
+
+        document = Document.query.get(doc_id)
+        if not document:
+            flash('Document not found. Please upload again.', 'error')
+            return redirect(url_for('upload.upload_document'))
+
+        text = document.extracted_text
+        print(f"Word count: {len(text.split())}")
+        print(f"Step 1 - Document fetch: {time.time() - t1:.2f}s")
+
+        t2 = time.time()
+        if mode == 'academic':
+            summary_data = academic_summary(text, length, output_format)
+            summary_text = json.dumps(summary_data)
+            display_summary = summary_data
+        else:
+            summary_text = general_summary(text, length, output_format)
+            display_summary = summary_text
+        print(f"Step 2 - Summarization: {time.time() - t2:.2f}s")
+
+        t3 = time.time()
+        keywords = extract_keywords(text)
+        keywords = [' '.join(kw.split()).strip() for kw in keywords]
+        keywords_str = ', '.join(keywords)
+        print(f"Step 3 Keywords: {time.time() - t3:.2f}s")
+
+        new_summary = Summary(
+            document_id=doc_id,
+            mode=mode,
+            length=length,
+            summary_text=summary_text,
+            keywords=keywords_str
+        )
+        db.session.add(new_summary)
+        db.session.commit()
+
+        session['current_summary_id'] = new_summary.summary_id
+
+        return render_template('result.html',
+            doc_name=doc_name,
+            mode=mode,
+            length=length,
+            output_format=output_format,
+            summary=display_summary,
+            keywords=keywords,
+            summary_id=new_summary.summary_id,
+            is_academic=(mode == 'academic'),
+            sample_questions=SAMPLE_QUESTIONS.get(mode, SAMPLE_QUESTIONS['general'])
+        )
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in generate_summary route: {e}")
+        flash('An error occurred during summarization. Please try again.', 'error')
         return redirect(url_for('upload.upload_document'))
-
-    mode = request.form.get('mode', 'general')
-    output_format = request.form.get('format', 'paragraph')
-    length = request.form.get('length', 'medium')
-    doc_name = session.get('current_doc_name')
-
-    document = Document.query.get(doc_id)
-    if not document:
-        flash('Document not found. Please upload again.', 'error')
-        return redirect(url_for('upload.upload_document'))
-
-    text = document.extracted_text
-    print(f"Word count: {len(text.split())}")
-    print(f"Step 1 - Document fetch: {time.time() - t1:.2f}s")
-
-    t2 = time.time()
-
-    if mode == 'academic':
-        summary_data = academic_summary(text, length, output_format)
-        summary_text = json.dumps(summary_data)
-        display_summary = summary_data
-    else:
-        summary_text = general_summary(text, length, output_format)
-        display_summary = summary_text
-    print(f"Step 2 - Summarization: {time.time() - t2:.2f}s")
-    t3 = time.time()
-    keywords = extract_keywords(text)
-    keywords=[' '.join(kw.split()).strip() for kw in keywords]
-    keywords_str = ', '.join(keywords)
-    print(f"Step 3 Keywords: {time.time() - t3:.2f}s")
-
-    print(f"TOTAL TIME: {time.time() - t1:.2f}s")
-
-    keywords = extract_keywords(text)
-    keywords_str = ', '.join(keywords)
-
-    new_summary = Summary(
-        document_id=doc_id,
-        mode=mode,
-        length=length,
-        summary_text=summary_text,
-        keywords=keywords_str
-    )
-    db.session.add(new_summary)
-    db.session.commit()
-
-    session['current_summary_id'] = new_summary.summary_id
-
-    return render_template('result.html',
-        doc_name=doc_name,
-        mode=mode,
-        length=length,
-        output_format=output_format,
-        summary=display_summary,
-        keywords=keywords,
-        summary_id=new_summary.summary_id,
-        is_academic=(mode == 'academic'),
-        # doc_id=doc_id,
-        sample_questions=SAMPLE_QUESTIONS[mode]
-    )
-
 
 @summarize.route('/download/<int:summary_id>')
 @login_required
 def download_summary(summary_id):
     """Download summary as PDF."""
-    summary = Summary.query.get_or_404(summary_id)
+    try:
+        summary = Summary.query.get_or_404(summary_id)
 
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buffer, pagesize=A4,
-        rightMargin=inch, leftMargin=inch,
-        topMargin=inch, bottomMargin=inch
-    )
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(
+            buffer, pagesize=A4,
+            rightMargin=inch, leftMargin=inch,
+            topMargin=inch, bottomMargin=inch
+        )
 
-    styles = getSampleStyleSheet()
-    story, doc_name = build_pdf_story(summary, styles)
-    doc.build(story)
-    buffer.seek(0)
+        styles = getSampleStyleSheet()
+        story, doc_name = build_pdf_story(summary, styles)
+        doc.build(story)
+        buffer.seek(0)
 
-    filename = (
-        f"Summary_{doc_name.rsplit('.', 1)[0]}"
-        f"_{datetime.now().strftime('%Y%m%d')}.pdf"
-    )
+        filename = (
+            f"Summary_{doc_name.rsplit('.', 1)[0]}"
+            f"_{datetime.now().strftime('%Y%m%d')}.pdf"
+        )
 
-    return send_file(
-        buffer,
-        as_attachment=True,
-        download_name=filename,
-        mimetype='application/pdf'
-    )
-
+        return send_file(
+            buffer,
+            as_attachment=True,
+            download_name=filename,
+            mimetype='application/pdf'
+        )
+    except Exception as e:
+        print(f"Error generating PDF: {e}")
+        flash('Could not generate PDF summary file.', 'error')
+        return redirect(url_for('auth.dashboard'))
 
 @summarize.route('/rate-summary', methods=['POST'])
 @login_required
 def rate_summary():
     """Save user rating for a summary."""
-    data = request.get_json()
-    summary_id = data.get('summary_id')
-    rating = data.get('rating')
+    try:
+        data = request.get_json()
+        summary_id = data.get('summary_id')
+        rating = data.get('rating')
 
-    summary = Summary.query.get(summary_id)
-    if summary:
-        summary.rating = rating
-        db.session.commit()
-        return jsonify({'status': 'success'})
-    return jsonify({'status': 'error'})
+        summary = Summary.query.get(summary_id)
+        if summary:
+            summary.rating = rating
+            db.session.commit()
+            return jsonify({'status': 'success'})
+        return jsonify({'status': 'error', 'message': 'Summary not found'})
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error rating summary: {e}")
+        return jsonify({'status': 'error', 'message': str(e)})

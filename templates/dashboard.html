@@ -2,12 +2,233 @@
 {% block title %}Dashboard — USP Summarization System{% endblock %}
 
 {% block content %}
+<style>
+    /* Navbar Styling */
+    .navbar {
+        background: #1a3a6b;
+        padding: 12px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .nav-brand-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+    }
+
+    /* Circular Cutout Logo - Removes Grey Background Box */
+    .nav-logo {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-brand-text {
+        color: #ffffff;
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .nav-brand-text span {
+        color: #f0a500;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .nav-user {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.92rem;
+        font-weight: 500;
+    }
+
+    .btn-logout {
+        background: #e11d48;
+        color: #ffffff;
+        padding: 7px 18px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: background 0.2s ease;
+    }
+
+    .btn-logout:hover {
+        background: #be123c;
+    }
+
+    .dashboard-wrapper {
+        max-width: 1050px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    /* Dark Navy Student Hero Banner */
+    .hero-banner {
+        background: #102342;
+        background: linear-gradient(135deg, #0f172a 0%, #1a3a6b 100%);
+        border-radius: 16px;
+        padding: 35px 40px;
+        color: #ffffff;
+        box-shadow: 0 10px 30px rgba(26, 58, 107, 0.2);
+        margin-bottom: 25px;
+    }
+
+    .hero-banner h1 {
+        font-size: 2.1rem;
+        font-weight: 700;
+        margin: 0 0 18px 0;
+        letter-spacing: 0.3px;
+    }
+
+    .pill-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .pill-badge {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1.5px solid #f0a500;
+        color: rgba(255, 255, 255, 0.9);
+        padding: 6px 18px;
+        border-radius: 30px;
+        font-size: 0.88rem;
+        font-weight: 500;
+    }
+
+    .pill-badge strong {
+        color: #f0a500;
+        font-weight: 600;
+    }
+
+    /* 3 Clean Stat Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 35px;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    }
+
+    .stat-icon-bg {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+    }
+
+    .stat-info h4 {
+        margin: 0 0 4px 0;
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .stat-info .stat-number {
+        margin: 0;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    /* Action Feature Cards Grid */
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+    }
+
+    .action-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 30px 25px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .action-card-icon {
+        font-size: 2.2rem;
+        margin-bottom: 15px;
+    }
+
+    .action-card h3 {
+        font-size: 1.15rem;
+        color: #1a3a6b;
+        margin: 0 0 10px 0;
+        font-weight: 700;
+    }
+
+    .action-card p {
+        font-size: 0.88rem;
+        color: #64748b;
+        margin: 0 0 22px 0;
+        line-height: 1.5;
+    }
+
+    .btn-action-card {
+        background: #1a3a6b;
+        color: #ffffff;
+        padding: 11px 22px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-block;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-action-card:hover {
+        background: #12284c;
+    }
+</style>
 
 <nav class="navbar">
-    <div class="nav-brand">
-        <strong>USP Summarization System</strong>
-    </div>
-    <div class="nav-links">
+    <a href="/dashboard" class="nav-brand-container">
+        <img src="/static/images/logo.png" alt="USP Logo" class="nav-logo">
+        <span class="nav-brand-text">USP <span>Summarization System</span></span>
+    </a>
+    <div class="nav-right">
         <span class="nav-user">{{ name }}</span>
         <a href="/logout" class="btn-logout">Logout</a>
     </div>
@@ -15,36 +236,71 @@
 
 <div class="dashboard-wrapper">
 
-    <div class="welcome-card">
-        <h2>Welcome, {{ name }}!</h2>
-        <div class="student-info">
-            <span><strong>Username:</strong> {{ username }}</span>
-            <span><strong>Department:</strong> {{ department }}</span>
-            <span><strong>Semester:</strong> {{ semester }}</span>
+    <!-- Dark Navy Student Hero Banner -->
+    <div class="hero-banner">
+        <h1>Welcome, {{ name }}!</h1>
+        <div class="pill-container">
+            <div class="pill-badge">Username: <strong>{{ username }}</strong></div>
+            <div class="pill-badge">Department: <strong>{{ department }}</strong></div>
+            <div class="pill-badge">Semester: <strong>{{ semester }}</strong></div>
         </div>
     </div>
 
-    <div class="action-cards">
-
-        <div class="card">
-            <div class="card-icon">📄</div>
-            <h3>Upload Document</h3>
-            <p>Upload PDF, DOCX, or TXT file to generate summary</p>
-            <a href="/upload" class="btn-card">Upload New Document</a>
+    <!-- 3 Clean Live Stat Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon-bg">📄</div>
+            <div class="stat-info">
+                <h4>Uploaded Documents</h4>
+                <p class="stat-number">{{ doc_count if doc_count is defined else 0 }}</p>
+            </div>
         </div>
 
-        <div class="card">
-            <div class="card-icon">📚</div>
-            <h3>My Library</h3>
-            <p>View all your previously generated summaries</p>
-            <a href="/library" class="btn-card">View Library</a>
+        <div class="stat-card">
+            <div class="stat-icon-bg">⚡</div>
+            <div class="stat-info">
+                <h4>Summaries Generated</h4>
+                <p class="stat-number">{{ summary_count if summary_count is defined else 0 }}</p>
+            </div>
         </div>
 
-        <div class="card">
-            <div class="card-icon">💬</div>
-            <h3>Chat with Document</h3>
-            <p>Ask questions about your uploaded documents</p>
-            <a href="/chat-page" class="btn-card">Start Chat</a>
+        <div class="stat-card">
+            <div class="stat-icon-bg">💬</div>
+            <div class="stat-info">
+                <h4>AI Chat Questions</h4>
+                <p class="stat-number">{{ chat_count if chat_count is defined else 0 }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3 Clean Action Cards -->
+    <div class="action-grid">
+
+        <div class="action-card">
+            <div>
+                <div class="action-card-icon">📄</div>
+                <h3>Upload Document</h3>
+                <p>Upload PDF, DOCX, or TXT file to generate summary</p>
+            </div>
+            <a href="/upload" class="btn-action-card">Upload New Document</a>
+        </div>
+
+        <div class="action-card">
+            <div>
+                <div class="action-card-icon">📚</div>
+                <h3>My Library</h3>
+                <p>View all your previously generated summaries</p>
+            </div>
+            <a href="/library" class="btn-action-card">View Library</a>
+        </div>
+
+        <div class="action-card">
+            <div>
+                <div class="action-card-icon">💬</div>
+                <h3>Chat with Document</h3>
+                <p>Ask questions about your uploaded documents</p>
+            </div>
+            <a href="/chat" class="btn-action-card">Start Chat</a>
         </div>
 
     </div>

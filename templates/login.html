@@ -3,69 +3,244 @@
 
 {% block content %}
 <style>
-    
-    .password-wrapper {
+    body, html {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Background Campus Image */
+    .login-container-bg {
+        min-height: 100vh;
+        width: 100%;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.55), rgba(26, 58, 107, 0.50)),
+                    url('/static/images/campus.webp') no-repeat center center / 100% 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+        perspective: 1000px;
+    }
+
+    /* Light Glassmorphism Card matching Image 1 */
+    .glass-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 20px;
+        padding: 60px 32px 30px 32px; /* Top padding space for overlapping logo */
+        width: 100%;
+        max-width: 410px;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+        color: #1e293b;
+        text-align: center;
+        transform-style: preserve-3d;
+        transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+    }
+
+    .glass-card:hover {
+        box-shadow: 0 25px 55px rgba(0, 0, 0, 0.38);
+    }
+
+    /* Circular Overlapping Logo Badge (Top Edge Alignment) */
+    .logo-wrapper {
+        position: absolute;
+        top: -52px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 104px;
+        height: 104px;
+        border-radius: 50%;
+        background: #ffffff;
+        padding: 4px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        z-index: 10;
+        transition: transform 0.3s ease;
+    }
+
+    .usp-logo {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover; /* Crop black corners, make logo circular */
+    }
+
+    .logo-wrapper:hover {
+        transform: translateX(-50%) scale(1.06);
+    }
+
+    .login-header h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+        color: #0f172a;
+        letter-spacing: 0.2px;
+    }
+
+    .login-header p {
+        font-size: 0.85rem;
+        color: #475569;
+        margin: 0 0 24px 0;
+        font-weight: 500;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.82rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #334155;
+    }
+
+    /* Input Field Container with Left & Right Icons */
+    .input-wrapper {
         position: relative;
         width: 100%;
         display: flex;
         align-items: center;
     }
 
-    .password-wrapper input {
+    .input-field {
         width: 100%;
-        padding-right: 55px; 
+        padding: 12px 42px 12px 40px; /* Space for left & right icons */
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 0.92rem;
+        color: #0f172a;
+        outline: none;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
     }
 
-    .toggle-password {
+    .input-field::placeholder {
+        color: #94a3b8;
+    }
+
+    .input-field:focus {
+        border-color: #1a3a6b;
+        box-shadow: 0 0 0 3px rgba(26, 58, 107, 0.15);
+    }
+
+    .field-icon {
         position: absolute;
-        right: 12px;
-        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
         user-select: none;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #1a3a6b;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
 
-    .toggle-password:hover {
-        color: #0056b3; 
+    .left-icon {
+        left: 14px;
+        font-size: 1.05rem;
+    }
+
+    .right-icon {
+        right: 14px;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .right-icon:hover {
+        color: #1a3a6b;
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 13px;
+        background: #1a3a6b;
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.98rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        box-shadow: 0 4px 15px rgba(26, 58, 107, 0.3);
+        transition: all 0.2s ease;
+    }
+
+    .btn-login:hover {
+        background: #12284c;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(26, 58, 107, 0.4);
+    }
+
+    .btn-login:active {
+        transform: translateY(0);
+    }
+
+    .login-note {
+        margin-top: 20px;
+        font-size: 0.78rem;
+        color: #64748b;
+        line-height: 1.45;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 16px;
     }
 </style>
 
-<div class="login-wrapper">
-    <div class="login-box">
-        
+<div class="login-container-bg" id="bgContainer">
+    <div class="glass-card" id="glassCard">
+
+        <!-- Overlapping Circular Logo -->
+        <div class="logo-wrapper">
+            <img
+                src="/static/images/logo.png"
+                alt="University of Southern Punjab Logo"
+                class="usp-logo"
+            >
+        </div>
+
         <div class="login-header">
             <h2>University of Southern Punjab</h2>
             <p>AI Document Summarization System</p>
         </div>
 
         <form method="POST" action="/login">
-            
+
             <div class="form-group">
                 <label for="username">USP Username</label>
-                <input 
-                    type="text" 
-                    id="username"
-                    name="username"
-                    placeholder="e.g. BSIT023R24-10"
-                    required
-                    autocomplete="off"
-                >
+                <div class="input-wrapper">
+                    <span class="field-icon left-icon"></span>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        class="input-field"
+                        placeholder="USP Username"
+                        required
+                        autocomplete="off"
+                    >
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="password">LMS Password</label>
-                <div class="password-wrapper">
-                    <input 
+                <div class="input-wrapper">
+                    <span class="field-icon left-icon"></span>
+                    <input
                         type="password"
                         id="password"
                         name="password"
-                        placeholder="Enter your LMS password"
+                        class="input-field"
+                        placeholder="LMS Password"
                         required
                     >
-                    <span class="toggle-password" id="togglePassword">Show</span>
+                    <!-- SVG Eye Icon -->
+                    <span class="field-icon right-icon toggle-password" id="togglePassword" title="Toggle Password">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </span>
                 </div>
             </div>
 
@@ -85,16 +260,36 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // Eye Icon SVG Toggle
     const passwordInput = document.getElementById('password');
     const togglePasswordBtn = document.getElementById('togglePassword');
 
-    togglePasswordBtn.addEventListener('click', function () {
-        // Check current type and flip it
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
+    const eyeOpenSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+    const eyeClosedSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
-        this.textContent = type === 'password' ? 'Show' : 'Hide';
-    });
+    if (togglePasswordBtn && passwordInput) {
+        togglePasswordBtn.addEventListener('click', function () {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            this.innerHTML = isPassword ? eyeClosedSVG : eyeOpenSVG;
+        });
+    }
+
+    // 3D Tilt Parallax Effect
+    const container = document.getElementById('bgContainer');
+    const card = document.getElementById('glassCard');
+
+    if (container && card) {
+        container.addEventListener('mousemove', function(e) {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 30;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 30;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        container.addEventListener('mouseleave', function() {
+            card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
+    }
 });
 </script>
 {% endblock %}
