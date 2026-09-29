@@ -1,92 +1,575 @@
 {% extends "base.html" %}
-{% block title %}My Library — USP Summarization{% endblock %}
+{% block title %}My Library — USP Summarization System{% endblock %}
 
 {% block content %}
+<style>
+    /* ==========================================================================
+       USP SUMMARIZATION SYSTEM - COMPACT MY LIBRARY DESIGN
+       ========================================================================== */
+    body {
+        background-color: #f0f4f8 !important;
+        color: #1e293b;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
 
+    /* Top Navigation Bar */
+    .navbar {
+        background-color: #0e2a4a;
+        padding: 0.6rem 1.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+.logo-circle {
+            width: 44px;
+            height: 44px;
+            background: #ffffff;
+            border-radius: 50%;
+            padding: 2px;
+            box-shadow: 0 0 12px rgba(240, 165, 0, 0.4);
+            border: 2px solid var(--usp-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-circle:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .nav-user {
+        font-size: 0.82rem;
+        color: #ffffff;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 0.35rem 0.8rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-nav {
+        color: #ffffff;
+        background-color: #1d3b66;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.82rem;
+        padding: 0.35rem 0.8rem;
+        border-radius: 6px;
+        transition: background 0.2s ease;
+    }
+
+    .btn-nav:hover {
+        background-color: #254a7c;
+        color: #ffffff;
+    }
+
+    .btn-logout {
+        color: #ffffff;
+        background-color: #ef4444;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.82rem;
+        padding: 0.35rem 0.8rem;
+        border-radius: 6px;
+        transition: background 0.2s ease;
+    }
+
+    .btn-logout:hover {
+        background-color: #dc2626;
+    }
+
+    /* Page Wrapper */
+    .page-wrapper {
+        max-width: 1200px;
+        margin: 1.25rem auto 3rem auto;
+        padding: 0 1.25rem;
+    }
+
+    /* Header Section */
+    .page-header {
+        margin-bottom: 0.85rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.35rem;
+        color: #0f2b4c;
+        margin: 0 0 0.2rem 0;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .page-header p {
+        color: #64748b;
+        font-size: 0.82rem;
+        margin: 0;
+    }
+
+    /* Filter & Search Bar */
+    .filter-bar {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.5rem 0.75rem;
+        margin-bottom: 1.25rem;
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .search-input-wrap {
+        flex: 1;
+        position: relative;
+    }
+
+    .search-input-wrap input {
+        width: 100%;
+        padding: 0.4rem 0.75rem 0.4rem 2rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.82rem;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+    .search-input-wrap input:focus {
+        border-color: #1d3b66;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.65rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.82rem;
+    }
+
+    .filter-select {
+        padding: 0.4rem 0.75rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.82rem;
+        background: #ffffff;
+        color: #334155;
+        outline: none;
+        cursor: pointer;
+    }
+
+    /* Compact Grid Layout - 3 Cards per Row */
+    .library-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+        gap: 0.85rem;
+    }
+
+    /* Compact Library Card */
+    .library-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.85rem 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .library-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .lib-card-top {
+        margin-bottom: 0.5rem;
+    }
+
+    .lib-doc-name {
+        font-size: 0.90rem;
+        font-weight: 700;
+        color: #0f2b4c;
+        line-height: 1.3;
+        margin-bottom: 0.35rem;
+        word-break: break-word;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .lib-meta-badges {
+        display: flex;
+        gap: 0.3rem;
+        margin-bottom: 0.45rem;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.55rem;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .badge-academic {
+        background: #ede9fe;
+        color: #5b21b6;
+    }
+
+    .badge-general {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .badge-length {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .lib-snippet {
+        font-size: 0.80rem;
+        color: #64748b;
+        line-height: 1.45;
+        margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .lib-keywords {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .keyword-chip {
+        font-size: 0.74rem;
+        background: #f1f5f9;
+        color: #475569;
+        padding: 0.1rem 0.5rem;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .lib-date {
+        font-size: 0.76rem;
+        color: #94a3b8;
+        margin-bottom: 0.65rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    /* Action Buttons Row */
+    .lib-card-actions {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.3rem;
+        margin-top: auto;
+    }
+
+    .btn-card {
+        padding: 0.32rem 0.2rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        border-radius: 6px;
+        text-decoration: none;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.2rem;
+        border: 1px solid transparent;
+        transition: all 0.15s ease;
+    }
+
+    .btn-view {
+        background-color: #1d3b66;
+        color: #ffffff;
+    }
+
+    .btn-view:hover {
+        background-color: #254a7c;
+    }
+
+    .btn-chat {
+        background-color: #eaf2ff;
+        color: #1d3b66;
+        border-color: #bfdbfe;
+    }
+
+    .btn-chat:hover {
+        background-color: #dbeafe;
+    }
+
+    .btn-pdf {
+        background-color: #fff9e6;
+        color: #92400e;
+        border-color: #fcd34d;
+    }
+
+    .btn-pdf:hover {
+        background-color: #fef3c7;
+    }
+
+    .btn-delete {
+        background-color: #ffeef0;
+        color: #ef4444;
+        border-color: #fca5a5;
+    }
+
+    .btn-delete:hover {
+        background-color: #fee2e2;
+        color: #dc2626;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: #ffffff;
+        border-radius: 10px;
+        border: 1px dashed #cbd5e1;
+        color: #64748b;
+    }
+</style>
+
+<!-- Top Navbar -->
 <nav class="navbar">
-    <div class="nav-brand"><strong>USP Summarization System</strong></div>
+    <div class="nav-brand">
+         <div class="logo-circle">
+                <img src="/static/images/logo.png" alt="USP Crest Logo" class="logo-img">
+            </div>
+        <span>USP Summarization System</span>
+
+    </div>
     <div class="nav-links">
-        <span class="nav-user">{{ session.user_name }}</span>
+        <span class="nav-user">👤 {{ session.user_name }}</span>
         <a href="/dashboard" class="btn-nav">Dashboard</a>
-        <a href="/upload" class="btn-nav">New Document</a>
+        <a href="/upload" class="btn-nav">+ New Document</a>
         <a href="/logout" class="btn-logout">Logout</a>
     </div>
 </nav>
 
 <div class="page-wrapper">
 
+    <!-- Page Title Header -->
     <div class="page-header">
-        <h2>My Summary Library</h2>
-        <p>{{ total }} summaries saved</p>
+        <h2>📙 My Summary Library</h2>
+        <p>{{ total if total else (items | length if items else 0) }} summaries saved in your repository</p>
     </div>
 
+    <!-- Filter & Search Bar -->
+    <div class="filter-bar">
+        <div class="search-input-wrap">
+            <span class="search-icon"></span>
+            <input type="text" id="searchInput" onkeyup="filterLibrary()" placeholder="Search by document name or keyword...">
+        </div>
+        <div class="col-md-3">
+        <div class="input-group">
+            <span class="input-group-text bg-white" title="Filter by Date"><i class="fa-solid fa-calendar-days text-primary"></i></span>
+            <input type="date" id="dateFilter" class="form-control" title="Select Date">
+            <button type="button" id="clearDateBtn" class="btn btn-outline-secondary" title="Clear Date" style="display: none;">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+        <select id="modeFilter" onchange="filterLibrary()" class="filter-select">
+            <option value="all">All Modes</option>
+            <option value="academic">Academic Mode</option>
+            <option value="general">General Mode</option>
+        </select>
+
+        <select id="sortFilter" onchange="sortLibrary()" class="filter-select">
+            <option value="newest">Sort by Newest</option>
+            <option value="oldest">Sort by Oldest</option>
+        </select>
+    </div>
+
+    <!-- Summary Cards Grid -->
     {% if items %}
-
-        <div class="library-grid">
+        <div class="library-grid" id="libraryGrid">
             {% for item in items %}
-            <div class="library-card">
+            <div class="library-card"
+                 data-doc="{{ item.doc_name | lower }}"
+                 data-mode="{{ item.mode | lower }}"
+                 data-date="{% if item.generated_date %}{{ item.generated_date.strftime('%Y-%m-%d')
+                if item.generated_date.strftime else item.generated_date }}{% else %}2026-09-15{% endif %}"
+                 data-keywords="{{ item.keywords | join(' ') | lower if item.keywords else '' }}">
 
-                <div class="lib-card-header">
-                    <div class="lib-doc-name">📄 {{ item.doc_name }}</div>
-                    <div class="lib-badges">
-                        <span class="badge badge-mode">{{ item.mode | capitalize }}</span>
-                        <span class="badge badge-length">{{ item.length | capitalize }}</span>
+                <div class="lib-card-top">
+                    <!-- Title -->
+                    <div class="lib-doc-name">
+                        {{ item.doc_name }}
+                    </div>
+
+                    <!-- Badges -->
+                    <div class="lib-meta-badges">
+                        <span class="badge {% if item.mode == 'academic' %}badge-academic{% else %}badge-general{% endif %}">
+                            {{ item.mode | capitalize }}
+                        </span>
+                        {% if item.length %}
+                        <span class="badge badge-length">
+                            {{ item.length | capitalize }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Snippet text -->
+                    {% if item.summary %}
+                    <div class="lib-snippet">
+                        {% if item.summary is mapping %}
+                            {% for k, v in item.summary.items() %}
+                                {{ v }}
+                            {% endfor %}
+                        {% else %}
+                            {{ item.summary }}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Keywords -->
+                    {% if item.keywords %}
+                    <div class="lib-keywords">
+                        {% for kw in item.keywords[:4] %}
+                            <span class="keyword-chip">{{ kw }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Date -->
+                    <div class="lib-date">
+                        {% if item.generated_date %}{{ item.generated_date.strftime('%d %b %Y') if item.generated_date.strftime else item.generated_date }}{% else %}15 Sep 2026{% endif %}
                     </div>
                 </div>
 
-                <div class="lib-preview">
-                    {{ item.preview }}
-                </div>
-
-                {% if item.keywords %}
-                <div class="lib-keywords">
-                    {% for kw in item.keywords.split(', ')[:4] %}
-                        <span class="keyword-tag">{{ kw }}</span>
-                    {% endfor %}
-                </div>
-                {% endif %}
-
-                <div class="lib-meta">
-                    <span>📅 {{ item.generated_date.strftime('%d %b %Y') }}</span>
-                    {% if item.rating %}
-                        <span>
-                            {% for i in range(item.rating) %}★{% endfor %}
-                            {% for i in range(5 - item.rating) %}☆{% endfor %}
-                        </span>
-                    {% endif %}
-                </div>
-
-                <div class="lib-actions">
-                    <a href="/library/view/{{ item.summary_id }}" class="btn-lib-view">
+                <!-- 4 Action Buttons Row -->
+                <div class="lib-card-actions">
+                    <a href="/library/view/{{ item.summary_id }}" class="btn-card btn-view" title="View Detail">
                         View
                     </a>
-                     <a href="/chat-page/{{ item.doc_id }}" class="btn-lib-chat">
-                       Chat
+                    <a href="/chat-page/{{ item.doc_id if item.doc_id else item.summary_id }}" class="btn-card btn-chat" title="Chat with PDF">
+                        Chat
                     </a>
-                    <a href="/download/{{ item.summary_id }}" class="btn-lib-download">
-                        Download
+                    <a href="/download/{{ item.summary_id }}" class="btn-card btn-pdf" title="Download PDF">
+                        PDF
                     </a>
-                    <form method="POST" action="/library/delete/{{ item.summary_id }}"
-                          onsubmit="return confirm('Delete this summary?')"
-                          style="display:inline;">
-                        <button type="submit" class="btn-lib-delete">Delete</button>
-                    </form>
+                    <a href="/library/delete/{{ item.summary_id }}" class="btn-card btn-delete" onclick="return confirm('Are you sure you want to delete this summary?');" title="Delete Summary">
+                        Delete
+                    </a>
                 </div>
+
             </div>
             {% endfor %}
         </div>
-
     {% else %}
-
-        <div class="empty-library">
-            <div class="empty-icon">📚</div>
-            <h3>No summaries yet</h3>
-            <p>Upload a document to generate your first summary</p>
-            <a href="/upload" class="btn-action">Upload Document</a>
+        <div class="empty-state">
+            <h3>No Summaries Found</h3>
+            <p>Upload a document to generate your first summary.</p>
+            <a href="/upload" class="btn-nav" style="display: inline-block; margin-top: 0.8rem;">+ Upload New Document</a>
         </div>
-
     {% endif %}
 
 </div>
+<script>
+    // Updated Filter Function (Includes Search + Mode + Calendar Date)
+    function filterLibrary() {
+        const queryEl = document.getElementById('searchInput');
+        const modeEl = document.getElementById('modeFilter');
+        const dateEl = document.getElementById('dateFilter');
+        const clearBtn = document.getElementById('clearDateBtn');
 
+        const query = queryEl ? queryEl.value.toLowerCase().trim() : '';
+        const mode = modeEl ? modeEl.value.toLowerCase() : 'all';
+        const selectedDate = dateEl ? dateEl.value : ''; // Format: YYYY-MM-DD
+
+        // Clear Date button visibility toggle
+        if (clearBtn) {
+            clearBtn.style.display = selectedDate ? 'inline-block' : 'none';
+        }
+
+        const cards = document.querySelectorAll('.library-card');
+
+        cards.forEach(card => {
+            const docName = (card.getAttribute('data-doc') || '').toLowerCase();
+            const cardMode = (card.getAttribute('data-mode') || '').toLowerCase();
+            const keywords = (card.getAttribute('data-keywords') || '').toLowerCase();
+            const cardDate = (card.getAttribute('data-date') || ''); // e.g. 2026-09-28
+
+            const matchesSearch = !query || docName.includes(query) || keywords.includes(query);
+            const matchesMode = (mode === 'all') || (cardMode === mode);
+            const matchesDate = !selectedDate || cardDate.includes(selectedDate);
+
+            if (matchesSearch && matchesMode && matchesDate) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Clear Date Input Function
+    function clearDateFilter() {
+        const dateEl = document.getElementById('dateFilter');
+        const clearBtn = document.getElementById('clearDateBtn');
+        if (dateEl) dateEl.value = '';
+        if (clearBtn) clearBtn.style.display = 'none';
+        filterLibrary();
+    }
+
+    // Existing Sort Function
+    function sortLibrary() {
+        const sortEl = document.getElementById('sortFilter') || document.getElementById('sortSelect');
+        const grid = document.getElementById('libraryGrid');
+        if (!grid) return;
+
+        const cards = Array.from(grid.children);
+        cards.reverse();
+        cards.forEach(card => grid.appendChild(card));
+    }
+
+    // Auto-attach event listeners on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateEl = document.getElementById('dateFilter');
+        const searchEl = document.getElementById('searchInput');
+        const modeEl = document.getElementById('modeFilter');
+        const clearBtn = document.getElementById('clearDateBtn');
+
+        if (dateEl) dateEl.addEventListener('change', filterLibrary);
+        if (searchEl) searchEl.addEventListener('input', filterLibrary);
+        if (modeEl) modeEl.addEventListener('change', filterLibrary);
+        if (clearBtn) clearBtn.addEventListener('click', clearDateFilter);
+    });
+</script>
 {% endblock %}

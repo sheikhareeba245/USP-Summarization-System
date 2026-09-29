@@ -1,11 +1,440 @@
 {% extends "base.html" %}
-{% block title %}Chat with Document — USP Summarization{% endblock %}
+{% block title %}Chat with Document — USP Summarization System{% endblock %}
 
 {% block content %}
+<style>
+    /* ==========================================================================
+       USP SUMMARIZATION SYSTEM - SPLIT SCREEN CHAT (EXACT UI FIX)
+       ========================================================================== */
+    body {
+        background-color: #f0f4f8 !important;
+        color: #1e293b;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
 
+    /* Top Navbar */
+    .navbar {
+        background: #1a3a6b;
+        padding: 12px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .nav-brand-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+    }
+
+    .nav-logo {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .nav-brand-text {
+        color: #ffffff;
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .nav-brand-text span {
+        color: #f0a500;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .nav-user {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.88rem;
+        font-weight: 500;
+    }
+
+    .btn-nav {
+        background: #1d3b66;
+        color: #ffffff;
+        padding: 6px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: background 0.2s ease;
+    }
+
+    .btn-nav:hover {
+        background: #254a7c;
+        color: #ffffff;
+    }
+
+    .btn-logout {
+        background: #e11d48;
+        color: #ffffff;
+        padding: 6px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: background 0.2s ease;
+    }
+
+    .btn-logout:hover {
+        background: #be123c;
+    }
+
+    /* Main Split Screen Layout */
+    .chat-split-wrapper {
+        display: flex;
+        max-width: 1280px;
+        height: calc(100vh - 90px);
+        margin: 15px auto;
+        padding: 0 15px;
+        gap: 15px;
+        box-sizing: border-box;
+    }
+
+    /* Left Sidebar: Documents List */
+    .sidebar-panel {
+        width: 320px;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    .sidebar-top {
+        padding: 14px 16px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .sidebar-top h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        color: #1a3a6b;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .sidebar-top p {
+        margin: 3px 0 0 0;
+        font-size: 0.78rem;
+        color: #64748b;
+    }
+
+    .sidebar-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    .sidebar-doc-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.15s ease;
+    }
+
+    .sidebar-doc-card:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
+    .sidebar-doc-card.active-doc-item {
+        background: #eaf2ff !important;
+        border-color: #1a3a6b !important;
+        box-shadow: 0 2px 6px rgba(26, 58, 107, 0.12);
+    }
+
+    .doc-icon-badge {
+        font-size: 1.25rem;
+    }
+
+    .doc-meta-info {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .doc-file-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #0f2b4c;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .doc-file-sub {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 2px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    /* Right Workspace: Chat Area */
+    .workspace-panel {
+        flex: 1;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    .workspace-top-bar {
+        padding: 12px 20px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .doc-title-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .doc-title-head h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        color: #1a3a6b;
+        font-weight: 700;
+    }
+
+    .active-badge {
+        background: #e0e7ff;
+        color: #3730a3;
+        font-size: 0.78rem;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-weight: 600;
+        border: 1px solid #c7d2fe;
+    }
+
+    /* Chat Scroll Window */
+    .chat-messages-container {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    /* Welcome Container */
+    .chat-welcome-box {
+        text-align: center;
+        margin: auto;
+        max-width: 520px;
+    }
+
+    .chat-welcome-box h4 {
+        color: #1a3a6b;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    .sample-prompts-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+        margin-top: 12px;
+    }
+
+    .prompt-chip {
+        background: #eaf2ff;
+        color: #1a3a6b;
+        border: 1px solid #bfdbfe;
+        padding: 5px 12px;
+        border-radius: 16px;
+        font-size: 0.80rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .prompt-chip:hover {
+        background: #dbeafe;
+    }
+
+    /* Chat Bubbles */
+    .chat-msg {
+        display: flex;
+        flex-direction: column;
+        max-width: 82%;
+    }
+
+    .user-msg { align-self: flex-end; }
+    .bot-msg { align-self: flex-start; }
+
+    .msg-bubble {
+        padding: 10px 15px;
+        border-radius: 12px;
+        font-size: 0.90rem;
+        line-height: 1.55;
+    }
+
+    .user-bubble {
+        background: #1a3a6b;
+        color: #ffffff;
+        border-bottom-right-radius: 2px;
+    }
+
+    .bot-bubble {
+        background: #f1f5f9;
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+        border-bottom-left-radius: 2px;
+    }
+
+    .msg-time {
+        font-size: 0.72rem;
+        color: #94a3b8;
+        margin-top: 3px;
+    }
+
+    .user-msg .msg-time { text-align: right; }
+    .bot-msg .msg-time { text-align: left; }
+
+    /* Method Badges */
+    .method-badge {
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 8px;
+        display: inline-block;
+        margin-bottom: 4px;
+    }
+
+    .extractive-badge {
+        background: #dcfce7;
+        color: #15803d;
+        border: 1px solid #86efac;
+    }
+
+    .ai-badge {
+        background: #f3e8ff;
+        color: #7e22ce;
+        border: 1px solid #d8b4fe;
+    }
+
+    /* Dynamic Yellow AI Fallback Banner */
+    .ai-suggest-div {
+        margin-top: 4px;
+        margin-bottom: 6px;
+    }
+
+    .ai-suggest-card {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 8px;
+        padding: 8px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .ai-suggest-card span {
+        font-size: 0.82rem;
+        color: #92400e;
+        font-weight: 500;
+    }
+
+    .btn-ai-ask {
+        background: #1a3a6b;
+        color: #ffffff;
+        border: none;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 0.80rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-ai-ask:hover {
+        background: #12284c;
+    }
+
+    /* Input Bar */
+    .chat-input-bar {
+        padding: 12px 18px;
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 10px;
+    }
+
+    .chat-input-bar input {
+        flex: 1;
+        padding: 9px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 0.88rem;
+        outline: none;
+    }
+
+    .chat-input-bar input:focus {
+        border-color: #1a3a6b;
+    }
+
+    .btn-send {
+        background: #1a3a6b;
+        color: #ffffff;
+        border: none;
+        padding: 9px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.88rem;
+        cursor: pointer;
+    }
+
+    .btn-send:hover {
+        background: #12284c;
+    }
+
+    .empty-state-box {
+        margin: auto;
+        text-align: center;
+        color: #64748b;
+    }
+</style>
+
+<!-- Top Navbar -->
 <nav class="navbar">
-    <div class="nav-brand"><strong>USP Summarization System</strong></div>
-    <div class="nav-links">
+    <a href="/dashboard" class="nav-brand-container">
+        <img src="/static/images/logo.png" alt="USP Logo" class="nav-logo">
+        <span class="nav-brand-text">USP <span>Summarization System</span></span>
+    </a>
+    <div class="nav-right">
         <span class="nav-user">{{ session.user_name }}</span>
         <a href="/dashboard" class="btn-nav">Dashboard</a>
         <a href="/library" class="btn-nav">Library</a>
@@ -13,83 +442,154 @@
     </div>
 </nav>
 
-<div class="page-wrapper">
+<!-- Active Document Selector Logic -->
+{% set active_doc = selected_doc if selected_doc else (documents[0] if documents else None) %}
 
-    {% if not selected_doc %}
+<div class="chat-split-wrapper">
+<!--LEFT SIDEBAR: Chat Documents -->
+<div class="sidebar-panel">
+    <div class="sidebar-top">
+        <h3>💬 Chat Documents</h3>
+        <p>Select a document to ask questions</p>
 
-    <div class="page-header">
-        <h2>💬 Chat with Document</h2>
-        <p>Select a document to start chatting</p>
-    </div>
-
-    {% if documents %}
-        <div class="doc-select-grid">
-            {% for doc in documents %}
-            <div class="doc-select-card" onclick="selectDoc({{ doc.document_id }}, '{{ doc.filename }}')">
-                <div class="doc-select-icon">📄</div>
-                <div class="doc-select-info">
-                    <strong>{{ doc.filename }}</strong>
-                    <small>{{ doc.upload_date.strftime('%d %b %Y') }}</small>
-                    <small>{{ doc.filetype.upper() }}</small>
-                </div>
-                <div class="doc-select-arrow">→</div>
+        <!-- 🔍 Full-Width Spacious Search Field -->
+        <div class="chat-search-container" style="margin-top: 12px; margin-bottom: 8px; width: 100%;">
+            <div style="position: relative; width: 100%;">
+                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 13px; pointer-events: none;">
+                    🔍
+                </span>
+                <input type="text"
+                       id="chatDocSearchInput"
+                       placeholder="Search document by name..."
+                       oninput="filterChatDocs()"
+                       style="width: 100%; height: 40px; padding-left: 34px; padding-right: 30px; font-size: 13px; border-radius: 10px; border: 1.5px solid #cbd5e1; background-color: #ffffff; color: #1e293b; outline: none; box-sizing: border-box; transition: all 0.2s ease-in-out;"
+                       onfocus="this.style.borderColor='#1a3a6b'; this.style.boxShadow='0 0 0 3px rgba(26, 58, 107, 0.1)';"
+                       onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+                <span id="clearChatSearchBtn"
+                      onclick="clearChatDocSearch()"
+                      style="display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; font-weight: bold; font-size: 13px;"
+                      title="Clear search">
+                    ✕
+                </span>
             </div>
+        </div>
+    </div> <!-- /sidebar-top -->
+
+    <div class="sidebar-scroll">
+        {% if documents or active_doc %}
+            {% set doc_list = documents if documents else [active_doc] %}
+            {% for doc in doc_list %}
+                <div class="sidebar-doc-card {% if active_doc and active_doc.document_id == doc.document_id %}active-doc-item{% endif %}"
+                     data-filename="{{ doc.filename | lower }}"
+                     onclick="selectDoc('{{ doc.document_id }}')">
+                    <div class="doc-icon-badge">📄</div>
+                    <div class="doc-meta-info">
+                        <div class="doc-file-title">{{ doc.filename }}</div>
+                        <div class="doc-file-sub">
+                            <span>{{ doc.filetype.upper() if doc.filetype else 'PDF' }}</span>
+                            <span>{% if doc.upload_date %}{{ doc.upload_date.strftime('%d %b %Y') if doc.upload_date.strftime else doc.upload_date }}{% else %}Recently{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
-        </div>
-    {% else %}
-        <div class="empty-library">
-            <div class="empty-icon">📄</div>
-            <h3>No documents yet</h3>
-            <p>Upload a document first to start chatting</p>
-            <a href="/upload" class="btn-action">Upload Document</a>
-        </div>
-    {% endif %}
-
-    {% else %}
-
-    <div class="chat-page-wrapper">
-
-        <div class="chat-page-header">
-            <div>
-                <h2>💬 Chat with Document</h2>
-                <p>📄 <strong>{{ selected_doc.filename }}</strong></p>
+        {% endif %}
+    </div>
+</div>
+    <!-- Right Panel: Chat Workspace -->
+    <div class="workspace-panel">
+        {% if active_doc %}
+            <!-- Top Workspace Bar -->
+            <div class="workspace-top-bar">
+                <div class="doc-title-head">
+                    <h3>💬 Chat Workspace</h3>
+                    <span class="active-badge">📄 {{ active_doc.filename }}</span>
+                </div>
+                <a href="/library" class="btn-nav" style="font-size: 0.78rem;">+ Select from Library</a>
             </div>
-            <a href="/chat-page" class="btn-nav">Change Document</a>
-        </div>
 
-        <div class="chat-messages" id="chatMessages" style="height:400px;">
-            <div class="chat-welcome">
-                <p>👋 Ask me anything about <strong>{{ selected_doc.filename }}</strong></p>
-                <div class="sample-questions">
-                    <span onclick="askSample(this)">What is this document about?</span>
-                    <span onclick="askSample(this)">What are the main points?</span>
-                    <span onclick="askSample(this)">What is the most important information?</span>
-                    <span onclick="askSample(this)">Summarize the key ideas</span>
+            <!-- Messages Window -->
+            <div class="chat-messages-container" id="chatMessages">
+                <div class="chat-welcome-box">
+                    <h4>👋 Ask me anything about <strong>{{ active_doc.filename }}</strong></h4>
+                    <p style="font-size: 0.82rem; color: #64748b; margin: 0;">Click a suggested question or type your own below:</p>
+                    <div class="sample-prompts-grid">
+                        <span class="prompt-chip" onclick="askSample(this)">What is this document about?</span>
+                        <span class="prompt-chip" onclick="askSample(this)">What are the main points?</span>
+                        <span class="prompt-chip" onclick="askSample(this)">What is the most important information?</span>
+                        <span class="prompt-chip" onclick="askSample(this)">Summarize the key ideas</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="chat-input-area">
-            <input
-                type="text"
-                id="chatInput"
-                placeholder="Ask a question about this document..."
-                onkeypress="if(event.key==='Enter') sendQuestion()"
-            >
-            <button onclick="sendQuestion()" id="chatSendBtn">Send</button>
-        </div>
-
+            <!-- Input Bar -->
+            <div class="chat-input-bar">
+                <input type="text"
+                       id="chatInput"
+                       placeholder="Ask a question about this document..."
+                       onkeypress="if(event.key==='Enter') sendQuestion()">
+                <button onclick="sendQuestion()" id="chatSendBtn" class="btn-send">Send</button>
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-state-box">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">📄</div>
+                <h3>No Document Selected</h3>
+                <p>Please upload a document to start chatting.</p>
+                <a href="/upload" class="btn-nav" style="display: inline-block; margin-top: 10px;">+ Upload Document</a>
+            </div>
+        {% endif %}
     </div>
 
-    <script>
-    const DOC_ID = {{ selected_doc.document_id }};
+</div>
+
+<!-- JavaScript Logic ------>
+<script>
+    // Real-time Chat Documents Search Function
+    function filterChatDocs() {
+        const inputEl = document.getElementById('chatDocSearchInput');
+        const clearBtn = document.getElementById('clearChatSearchBtn');
+        const query = inputEl ? inputEl.value.toLowerCase().trim() : '';
+        // Show/Hide Clear "X" button
+        if (clearBtn) {
+            clearBtn.style.display = query ? 'block' : 'none';
+        }
+        const cards = document.querySelectorAll('.sidebar-doc-card');
+        cards.forEach(card => {
+            const fileName = (card.getAttribute('data-filename') || card.innerText || '').toLowerCase();
+            if (!query || fileName.includes(query)) {
+                card.style.display = 'flex'; // Shows matching document
+            } else {
+                card.style.display = 'none'; // Hides non-matching document
+            }
+        });
+    }
+    // Clear Search Field Function
+    function clearChatDocSearch() {
+        const inputEl = document.getElementById('chatDocSearchInput');
+        if (inputEl) {
+            inputEl.value = '';
+            filterChatDocs();
+            inputEl.focus();
+        }
+    }
+    const DOC_ID = parseInt("{{ active_doc.document_id if active_doc else 0 }}") || null;
+
+    function selectDoc(docId) {
+        if (docId) {
+            window.location.href = '/chat-page/' + docId;
+        }
+    }
 
     function askSample(el) {
-        document.getElementById('chatInput').value = el.textContent;
-        sendQuestion();
+        const input = document.getElementById('chatInput');
+        if (input) {
+            input.value = el.textContent;
+            sendQuestion();
+        }
     }
 
     function sendQuestion() {
+        if (!DOC_ID) return;
         const input = document.getElementById('chatInput');
         const question = input.value.trim();
         if (!question) return;
@@ -120,6 +620,10 @@
 
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
             document.getElementById('chatSendBtn').disabled = false;
+        })
+        .catch(err => {
+            hideTyping();
+            document.getElementById('chatSendBtn').disabled = false;
         });
     }
 
@@ -135,14 +639,14 @@
 
         if (type === 'user') {
             div.innerHTML = `
-                <div class="msg-bubble user-bubble"><p>${text}</p></div>
+                <div class="msg-bubble user-bubble"><p style="margin:0;">${text}</p></div>
                 <div class="msg-time">You</div>
             `;
         } else {
             div.innerHTML = `
                 <div class="msg-bubble bot-bubble">
                     ${badge}
-                    <p>${text}</p>
+                    <p style="margin:0;">${text}</p>
                 </div>
                 <div class="msg-time">USP Assistant</div>
             `;
@@ -155,15 +659,17 @@
     function appendAIButton(container, question) {
         const div = document.createElement('div');
         div.className = 'ai-suggest-div';
+        const cleanQ = question.replace(/'/g, "\\'");
         div.innerHTML = `
             <div class="ai-suggest-card">
-                <span>🤔 Not fully satisfied?</span>
-                <button class="btn-ai-ask" onclick="askAI('${question.replace(/'/g, "\\'")}', this)">
+                <span>🤔 Not fully satisfied with document search?</span>
+                <button class="btn-ai-ask" onclick="askAI('${cleanQ}', this)">
                     ✨ Ask AI Assistant
                 </button>
             </div>
         `;
         container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
     }
 
     function askAI(question, btn) {
@@ -185,8 +691,14 @@
         .then(data => {
             hideTyping();
             appendMessage(messagesDiv, data.answer, 'bot', 'ai_generated');
-            btn.closest('.ai-suggest-div').remove();
+            const parentCard = btn.closest('.ai-suggest-div');
+            if (parentCard) parentCard.remove();
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        })
+        .catch(err => {
+            hideTyping();
+            btn.disabled = false;
+            btn.textContent = '✨ Ask AI Assistant';
         });
     }
 
@@ -207,17 +719,5 @@
         const t = document.getElementById('typingIndicator');
         if (t) t.remove();
     }
-
-    </script>
-
-    {% endif %}
-
-</div>
-
-<script>
-function selectDoc(docId, docName) {
-    window.location.href = '/chat-page/' + docId;
-}
 </script>
-
 {% endblock %}

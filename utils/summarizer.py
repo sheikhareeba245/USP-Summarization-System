@@ -226,14 +226,16 @@ def general_summary(text, length='medium', output_format='paragraph'):
         sentences = lexrank_extract(cleaned, num)
         unique = _remove_duplicate_sentences(sentences)
 
-        if output_format == 'bullets':
+        if output_format in ['bullets', 'bullet', 'bullet_points']:
             return '\n'.join(['• ' + re.sub(r'\s+', ' ', s).strip() for s in unique])
 
         # Single fluid continuous paragraph for justified alignment
         return re.sub(r'\s+', ' ', ' '.join(unique)).strip()
+
     except Exception as e:
         print(f"Error in general_summary: {e}")
         return "Unable to generate summary due to processing error."
+
 
 def _summarize_section(sec_text, fallback_text, num, output_format):
     """Summarize a single section with fallback."""
@@ -246,15 +248,17 @@ def _summarize_section(sec_text, fallback_text, num, output_format):
         if not sentences:
             sentences = lexrank_extract(fallback_text, num)
 
-        if output_format == 'bullets':
+        if output_format in ['bullets', 'bullet', 'bullet_points']:
             return '\n'.join(['• ' + re.sub(r'\s+', ' ', s).strip() for s in sentences]) if sentences else '• Content not available.'
 
         # Clean string without linebreaks
         res = ' '.join([re.sub(r'\s+', ' ', s).strip() for s in sentences])
         return res if res else 'Content not available.'
+
     except Exception as e:
         print(f"Error in _summarize_section: {e}")
         return "Content processing error."
+
 
 def academic_summary(text, length='medium', output_format='paragraph'):
     """Generate academic structured summary with IMRaD sections."""

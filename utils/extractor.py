@@ -86,6 +86,11 @@ def get_file_size(file_path):
     return f"{size // (1024 * 1024)} MB"
 
 def clean_extracted_text(text):
+    """Clean extracted text, fix broken hyphenated words, and remove junk lines."""
+    if not text:
+        return ""
+    text = re.sub(r'(\b[a-zA-Z]{2,})-\s*\n?\s*([a-zA-Z]{2,}\b)', r'\1\2', text)
+    text = re.sub(r'[ \t]+', ' ', text)
     """Clean extracted text remove junk lines."""
     lines = text.split('\n')
     clean_lines = []
@@ -96,8 +101,7 @@ def clean_extracted_text(text):
         # Skip empty lines
         if not line:
             continue
-
-        # Skip lines jo mostly numbers hain
+        # Skip lines which is mostly numbers
         words = line.split()
         if not words:
             continue
@@ -109,15 +113,13 @@ def clean_extracted_text(text):
         if len(words) > 0 and num_count / len(words) > 0.6:
             continue
 
-        # Skip lines jo bohat choti hain — less than 4 words
         if len(words) < 4:
             continue
-
-        # Skip lines jo citations hain
+        # Skip lines which has citations
         if re.match(r'^\(?\d{4}\)?', line) and len(words) < 10:
             continue
 
-        # Skip lines jo mostly special characters hain
+        # Skip lines which has mostly special characters
         alpha_count = sum(1 for c in line if c.isalpha())
         if len(line) > 0 and alpha_count / len(line) < 0.4:
             continue

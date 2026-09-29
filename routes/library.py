@@ -107,23 +107,31 @@ def view_summary(summary_id):
         rating=summary.rating
     )
 
-
-@library.route('/library/delete/<int:summary_id>', methods=['POST'])
+@library.route('/delete/<int:summary_id>', methods=['GET', 'POST'])
+@library.route('/library/delete/<int:summary_id>', methods=['GET', 'POST'])
 @login_required
 def delete_summary(summary_id):
     """Delete a summary from library"""
-    summary = Summary.query.get_or_404(summary_id)
-    document = Document.query.get(summary.document_id)
+    try:
+        summary = Summary.query.get_or_404(summary_id)
+        document = Document.query.get(summary.document_id)
 
-    if document.user_id != session['user_id']:
-        return jsonify({'status': 'error', 'message': 'Access denied'})
+        # Security Ownership Check
+        if document and document.user_id != session.get('user_id'):
+            flash('Access denied.', 'error')
+            return redirect(url_for('library.view_library'))
 
-    db.session.delete(summary)
-    db.session.commit()
+        db.session.delete(summary)
+        db.session.commit()
 
-    flash('Summary deleted successfully.', 'success')
+        flash('Summary deleted successfully.', 'success')
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Delete error: {e}")
+        flash('Error deleting summary.', 'error')
+
     return redirect(url_for('library.view_library'))
-
 
 @library.route('/library/rate/<int:summary_id>', methods=['POST'])
 @login_required

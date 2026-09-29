@@ -2,121 +2,607 @@
 {% block title %}Summary Detail — USP Summarization{% endblock %}
 
 {% block content %}
+<style>
+    /* ==========================================================================
+       USP SUMMARIZATION SYSTEM
+       ========================================================================== */
+    body {
+        background-color: #f1f5f9 !important;
+        color: #1e293b;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
 
+    /* --- Top Navigation Bar (Dark Navy matching Image 1) --- */
+    .navbar {
+        background-color: #0d2847;
+        padding: 0.75rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .logo-circle {
+            width: 44px;
+            height: 44px;
+            background: #ffffff;
+            border-radius: 50%;
+            padding: 2px;
+            box-shadow: 0 0 12px rgba(240, 165, 0, 0.4);
+            border: 2px solid var(--usp-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-circle:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .nav-user {
+        font-size: 0.88rem;
+        color: #ffffff;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-nav {
+        color: #ffffff;
+        background-color: #1d3b66;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.88rem;
+        padding: 0.45rem 0.95rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-nav:hover {
+        background-color: #254a7c;
+        color: #ffffff;
+    }
+
+    .btn-logout {
+        color: #ffffff;
+        background-color: #ef4444;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.88rem;
+        padding: 0.45rem 0.95rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-logout:hover {
+        background-color: #dc2626;
+    }
+
+    /* --- Page Container (Compact Proportions) --- */
+    .page-wrapper {
+        max-width: 950px;
+        margin: 1.75rem auto 3rem auto;
+        padding: 0 1.25rem;
+    }
+
+    /* --- Header & Badges Card --- */
+    .detail-header-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .header-left h2 {
+        margin: 0 0 0.6rem 0;
+        font-size: 1.4rem;
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .meta-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .badge {
+        padding: 0.3rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .badge-doc {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    .badge-academic {
+        background: #ede9fe;
+        color: #5b21b6;
+    }
+
+    .badge-general {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .badge-length {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-date {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .btn-back {
+        background: #1d3b66;
+        color: #ffffff;
+        text-decoration: none;
+        padding: 0.45rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: background 0.2s;
+    }
+
+    .btn-back:hover {
+        background: #254a7c;
+        color: #ffffff;
+    }
+
+    /* --- Action Toolbar --- */
+    .detail-toolbar {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.85rem 1.25rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .toolbar-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .btn-action {
+        padding: 0.45rem 1rem;
+        border-radius: 6px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-copy {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .btn-copy:hover {
+        background: #cbd5e1;
+    }
+
+    .btn-download {
+        background: #f59e0b;
+        color: #ffffff;
+    }
+
+    .btn-download:hover {
+        background: #d97706;
+    }
+
+    .summary-id-tag {
+        font-size: 0.82rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    /* --- Main Summary White Card --- */
+    .summary-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.75rem 2rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .summary-body {
+        color: #334155;
+        font-size: 0.98rem;
+        line-height: 1.75;
+    }
+
+    /* STRICT JUSTIFIED TEXT ALIGNMENT */
+    .summary-body p {
+        text-align: justify !important;
+        text-justify: inter-word !important;
+        margin-top: 0;
+        margin-bottom: 1.2rem;
+        white-space: normal !important;
+        word-break: normal !important;
+    }
+
+    .academic-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.2rem;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .academic-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .academic-section h3 {
+        color: #d97706;
+        font-size: 1.15rem;
+        margin-top: 0;
+        margin-bottom: 0.6rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    /* --- Keywords Section --- */
+    .keywords-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .keywords-card h4 {
+        margin: 0 0 0.75rem 0;
+        color: #0f172a;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .keywords-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    .keyword-chip {
+        background: #e0f2fe;
+        color: #0369a1;
+        border: 1px solid #bae6fd;
+        padding: 0.25rem 0.75rem;
+        border-radius: 16px;
+        font-size: 0.82rem;
+        font-weight: 500;
+    }
+
+    /* --- Rating Section --- */
+    .rating-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .rating-card h4 {
+        margin: 0 0 0.3rem 0;
+        color: #0f172a;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .rating-subtitle {
+        color: #64748b;
+        font-size: 0.82rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .star-rating-box {
+        display: inline-flex;
+        gap: 0.4rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .star-btn {
+        background: transparent;
+        border: none;
+        font-size: 1.6rem;
+        color: #cbd5e1;
+        cursor: pointer;
+        transition: transform 0.15s ease, color 0.15s ease;
+        padding: 0 0.15rem;
+    }
+
+    .star-btn:hover,
+    .star-btn.active {
+        color: #f59e0b;
+        transform: scale(1.15);
+    }
+
+    .rating-status-text {
+        font-size: 0.85rem;
+        color: #059669;
+        font-weight: 600;
+        min-height: 1.2rem;
+    }
+</style>
+
+<!-- Top Navbar-->
 <nav class="navbar">
-    <div class="nav-brand"><strong>USP Summarization System</strong></div>
+    <div class="nav-brand">
+        <div class="logo-circle">
+                <img src="/static/images/logo.png" alt="USP Crest Logo" class="logo-img">
+            </div>
+        <span>USP Summarization System</span>
+    </div>
     <div class="nav-links">
-        <span class="nav-user">{{ session.user_name }}</span>
+        <span class="nav-user">👤 {{ session.user_name }}</span>
+        <a href="/dashboard" class="btn-nav">Dashboard</a>
         <a href="/library" class="btn-nav">My Library</a>
-        <a href="/upload" class="btn-nav">New Document</a>
+        <a href="/upload" class="btn-nav">+ New Document</a>
         <a href="/logout" class="btn-logout">Logout</a>
     </div>
 </nav>
 
 <div class="page-wrapper">
 
-    <div class="result-header">
-        <h2>Summary Detail</h2>
-        <div class="result-meta">
-            <span class="badge">{{ doc_name }}</span>
-            <span class="badge">{{ mode | capitalize }} Mode</span>
-            <span class="badge">{{ length | capitalize }}</span>
-            <span class="badge">{{ generated_date.strftime('%d %b %Y') }}</span>
+    <!-- Header Card -->
+    <div class="detail-header-card">
+        <div class="header-left">
+            <h2>Summary Detail</h2>
+            <div class="meta-badges">
+                <span class="badge badge-doc">{{ doc_name }}</span>
+                <span class="badge {% if mode == 'academic' %}badge-academic{% else %}badge-general{% endif %}">
+                    {% if mode == 'academic' %} Academic Mode{% else %} General Mode{% endif %}
+                </span>
+                <span class="badge badge-length"> {{ length | capitalize }}</span>
+                <span class="badge badge-date"> {{ generated_date.strftime('%d %b %Y') }}</span>
+            </div>
+        </div>
+        <div>
+            <a href="/library" class="btn-back">← Back to Library</a>
         </div>
     </div>
 
-    <div class="result-grid">
+    <!-- Action Toolbar -->
+    <div class="detail-toolbar">
+        <div class="toolbar-actions">
+            <button id="copyBtn" onclick="copySummary()" class="btn-action btn-copy">
+                 Copy Text
+            </button>
+            <a href="/download/{{ summary_id }}" class="btn-action btn-download">
+                 Download PDF
+            </a>
+        </div>
+        <div class="summary-id-tag">
+            Summary ID: #{{ summary_id }}
+        </div>
+    </div>
 
-        <div class="result-card">
-            <div class="card-header">
-                <h3>Summary</h3>
-                <button class="btn-copy" onclick="copySummary()">Copy</button>
-            </div>
-
-            <div class="summary-content" id="summaryContent">
-                {% if is_academic %}
-                    {% for section, content in summary.items() %}
-                        <div class="academic-section">
-                            <h4 class="section-title">{{ section }}</h4>
-                            <div class="section-content">
-                                {% for line in content.split('\n') %}
-                                    {% if line.strip() %}
-                                        <p>{{ line }}</p>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    {% for line in summary.split('\n') %}
-                        {% if line.strip() %}
-                            <p>{{ line }}</p>
+    <!-- Main White Summary Card -->
+    <!-- <div class="summary-card">
+        <div class="summary-body" id="summaryText">
+            {% if is_academic and summary is mapping %}
+                {% for sec_title, sec_content in summary.items() %}
+                    <div class="academic-section">
+                        <h3> {{ sec_title }}</h3>
+                        <p>{{ sec_content }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                {% if summary is string %}
+                    {% for paragraph in summary.split('\n\n') %}
+                        {% if paragraph.strip() %}
+                            <p>{{ paragraph.strip() }}</p>
                         {% endif %}
                     {% endfor %}
+                {% else %}
+                    <p>{{ summary }}</p>
                 {% endif %}
-            </div>
-
-            <div class="card-actions">
-                <button class="btn-action" onclick="copySummary()">Copy</button>
-                <a href="/download/{{ summary_id }}" class="btn-action">Download PDF</a>
-                <a href="/library" class="btn-action btn-outline">Back to Library</a>
-            </div>
+            {% endif %}
         </div>
+    </div> -->
+    <!-- Main White Summary Card-->
+    <div class="summary-card">
+        <div class="summary-body" id="summaryText">
+            {% if is_academic and summary is mapping %}
+                <!-- 1. Academic Structured Sections (Abstract, Intro, Method, etc.) -->
+                {% for sec_title, sec_content in summary.items() %}
+                    <div class="academic-section">
+                        <h3>{{ sec_title }}</h3>
+                        <p style="text-align: justify !important; line-height: 1.8;">{{ sec_content }}</p>
+                    </div>
+                {% endfor %}
 
-        <div class="side-panel">
-
-            <div class="keywords-card">
-                <h3>Keywords</h3>
-                <div class="keywords-list">
-                    {% for kw in keywords %}
-                        <span class="keyword-tag">{{ kw }}</span>
+            {% elif summary is string and '•' in summary %}
+                <!-- 2. Bullet Points Summary List (Line-by-Line Cards) -->
+                <div class="bullet-summary-wrapper">
+                    {% for point in summary.split('•') %}
+                        {% if point.strip() %}
+                            <div class="bullet-point-item" style="background: #f8fafc; border-left: 4px solid #f59e0b; padding: 0.9rem 1.1rem; border-radius: 8px; margin-bottom: 0.85rem; box-shadow: 0 1px 4px rgba(0,0,0,0.02);">
+                                <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+                                    <span style="color: #f59e0b; font-size: 1.2rem; line-height: 1; font-weight: bold;">•</span>
+                                    <span style="font-size: 0.96rem; color: #334155; line-height: 1.75; text-align: justify !important; width: 100%;">
+                                        {{ point.strip() }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
-            </div>
 
-            <div class="rating-card">
-                <h3>Your Rating</h3>
-                <div class="stars" id="stars">
-                    {% for i in range(1, 6) %}
-                        <span class="star"
-                            data-value="{{ i }}"
-                            onclick="rateSummary({{ i }})"
-                            style="color: {% if rating and i <= rating %}#f0a500{% else %}#ddd{% endif %}">
-                            ★
-                        </span>
-                    {% endfor %}
-                </div>
-                <p class="rating-msg" id="ratingMsg">
-                    {% if rating %}Rated {{ rating }}/5{% endif %}
-                </p>
-            </div>
+            {% elif summary is string %}
+                <!-- 3. Standard Paragraphs -->
+                {% for paragraph in summary.split('\n') %}
+                    {% if paragraph.strip() %}
+                        <p style="text-align: justify !important; line-height: 1.8; margin-bottom: 1rem;">
+                            {{ paragraph.strip() }}
+                        </p>
+                    {% endif %}
+                {% endfor %}
 
+            {% else %}
+                <!-- 4. Direct Fallback -->
+                <p style="text-align: justify !important; line-height: 1.8;">{{ summary }}</p>
+            {% endif %}
         </div>
     </div>
+    <!-- Extracted Keywords Card -->
+    {% if keywords %}
+    <div class="keywords-card">
+        <h4> Extracted Key Terms & Concepts</h4>
+        <div class="keywords-wrapper">
+            {% for kw in keywords %}
+                <span class="keyword-chip">{{ kw }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Rating System Card -->
+    <div class="rating-card">
+        <h4>Rate Summary Quality</h4>
+        <div class="rating-subtitle">Help us improve sentence extraction and accuracy</div>
+
+        <div class="star-rating-box">
+            {% for i in range(1, 6) %}
+                <button type="button"
+                        class="star-btn {% if rating and i <= rating %}active{% endif %}"
+                        onclick="rateSummary({{ i }})"
+                        title="{{ i }} Stars">
+                    ★
+                </button>
+            {% endfor %}
+        </div>
+
+        <div class="rating-status-text" id="ratingStatus">
+            {% if rating %}
+                You rated this summary {{ rating }} / 5 stars
+            {% else %}
+                Click a star to rate
+            {% endif %}
+        </div>
+    </div>
+
 </div>
 
+<!-- JavaScript Functions -->
 <script>
-function copySummary() {
-    const content = document.getElementById('summaryContent').innerText;
-    navigator.clipboard.writeText(content).then(function() {
-        const btn = document.querySelector('.btn-copy');
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = 'Copy', 2000);
-    });
-}
+    function copySummary() {
+        const textContainer = document.getElementById('summaryText');
+        const textToCopy = textContainer.innerText || textContainer.textContent;
 
-function rateSummary(value) {
-    document.querySelectorAll('.star').forEach((star, i) => {
-        star.style.color = i < value ? '#f0a500' : '#ddd';
-    });
-    fetch('/library/rate/{{ summary_id }}', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({rating: value})
-    }).then(() => {
-        document.getElementById('ratingMsg').textContent = 'Rated ' + value + '/5';
-    });
-}
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const btn = document.getElementById('copyBtn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '✓ Copied!';
+            btn.style.background = '#dcfce7';
+            btn.style.color = '#15803d';
+
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.background = '';
+                btn.style.color = '';
+            }, 2000);
+        }).catch(err => {
+            alert('Could not copy text automatically.');
+        });
+    }
+
+    function rateSummary(val) {
+        fetch('/library/rate/{{ summary_id }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ rating: val })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success' || data.success) {
+                updateStarUI(val);
+                const statusElem = document.getElementById('ratingStatus');
+                if (statusElem) {
+                    statusElem.innerText = `You rated this ${val} / 5 stars!`;
+                }
+            } else {
+                alert('Failed to save rating.');
+            }
+        })
+        .catch(err => {
+            console.error('Rating error:', err);
+            updateStarUI(val);
+        });
+    }
+
+    function updateStarUI(ratingVal) {
+        const stars = document.querySelectorAll('.star-btn');
+        stars.forEach((star, index) => {
+            if (index < ratingVal) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    }
 </script>
-
 {% endblock %}
