@@ -296,3 +296,32 @@ def academic_summary(text, length='medium', output_format='paragraph'):
             'Results': 'Error processing document results.',
             'Conclusion': 'Error processing document conclusion.'
         }
+def calculate_summary_stats(original_text, summary_text):
+    """Calculate original word count, summary word count,
+    and compression percentage."""
+    # 1. Original text word count
+    orig_words = len(original_text.split()) if original_text else 0
+
+    # 2. Summary text word count (Handles string, list, or dict format)
+    if isinstance(summary_text, dict):
+        sum_str = " ".join([str(v) for v in summary_text.values()])
+    elif isinstance(summary_text, list):
+        sum_str = " ".join([str(v) for v in summary_text])
+    else:
+        sum_str = str(summary_text or "")
+
+    sum_words = len(sum_str.split())
+
+    # 3. Calculate Reduction Percentage
+    if orig_words > 0 and sum_words <= orig_words:
+        reduction_pct = round((1 - (sum_words / orig_words)) * 100, 1)
+    elif orig_words > 0:
+        reduction_pct = 0.0
+    else:
+        reduction_pct = 0.0
+
+    return {
+        'original_words': orig_words,
+        'summary_words': sum_words,
+        'reduction_pct': reduction_pct
+    }

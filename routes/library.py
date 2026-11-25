@@ -8,6 +8,7 @@ from flask import (
 from extensions import db
 from models.summary import Summary
 from models.document import Document
+from utils.summarizer import calculate_summary_stats
 
 library = Blueprint('library', __name__)
 
@@ -93,6 +94,8 @@ def view_summary(summary_id):
         summary_data = summary.summary_text
         is_academic = False
 
+    raw_text = document.raw_text if (document and hasattr(document, 'raw_text')) else ""
+    stats = calculate_summary_stats(raw_text, summary.summary_text)
     keywords = summary.keywords.split(', ') if summary.keywords else []
 
     return render_template('summary_detail.html',
@@ -104,7 +107,8 @@ def view_summary(summary_id):
         keywords=keywords,
         summary_id=summary.summary_id,
         generated_date=summary.generated_date,
-        rating=summary.rating
+        rating=summary.rating,
+        stats=stats
     )
 
 @library.route('/delete/<int:summary_id>', methods=['GET', 'POST'])

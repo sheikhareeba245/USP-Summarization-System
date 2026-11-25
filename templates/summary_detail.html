@@ -436,31 +436,6 @@
         <div class="summary-id-tag">
             Summary ID: #{{ summary_id }}
         </div>
-    </div>
-
-    <!-- Main White Summary Card -->
-    <!-- <div class="summary-card">
-        <div class="summary-body" id="summaryText">
-            {% if is_academic and summary is mapping %}
-                {% for sec_title, sec_content in summary.items() %}
-                    <div class="academic-section">
-                        <h3> {{ sec_title }}</h3>
-                        <p>{{ sec_content }}</p>
-                    </div>
-                {% endfor %}
-            {% else %}
-                {% if summary is string %}
-                    {% for paragraph in summary.split('\n\n') %}
-                        {% if paragraph.strip() %}
-                            <p>{{ paragraph.strip() }}</p>
-                        {% endif %}
-                    {% endfor %}
-                {% else %}
-                    <p>{{ summary }}</p>
-                {% endif %}
-            {% endif %}
-        </div>
-    </div> -->
     <!-- Main White Summary Card-->
     <div class="summary-card">
         <div class="summary-body" id="summaryText">
